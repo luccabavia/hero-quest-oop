@@ -1,7 +1,7 @@
-package character.monster;
+package entity.character.monster;
 
 import map.Map;
-import character.Character;
+import entity.character.Character;
 
 public abstract class Moster extends Character {
 
