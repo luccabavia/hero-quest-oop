@@ -1,8 +1,9 @@
-package character;
+package entity.character;
 
+import entity.Entity;
 import map.Map;
 
-public abstract class Character {
+public abstract class Character extends Entity {
 
     protected Map map;
     protected int X;
@@ -12,10 +13,18 @@ public abstract class Character {
     protected int movementDice;
     protected int bodyPoints;
     protected int mindPoints;
-    protected String sprite;
 //    private Weapon weapon;
 //    private Spell[] spells;
 
+    /**
+     * Constructor method for character parent class.
+     *
+     * @param map Map
+     * @param X int
+     * @param Y int
+     * @param movementDice int
+     * @param sprite String
+     */
     public Character(Map map, int X, int Y, int movementDice, String sprite) {
         this.map = map;
         this.X = X;
@@ -30,13 +39,11 @@ public abstract class Character {
 
     public abstract void defend();
 
-    protected abstract void takeDamage();
+    public void sufferEffect(int value) {
+        this.bodyPoints += value;
+    }
 
     protected abstract void castSpell();
-
-    protected String getSprite() {
-        return this.sprite;
-    }
 
     public String getStatus() {
         String s = String.format(
