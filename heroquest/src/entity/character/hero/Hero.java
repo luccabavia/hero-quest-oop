@@ -1,9 +1,9 @@
-package character.hero;
+package entity.character.hero;
 
 import bag.Bag;
 import io.Display;
 import map.Map;
-import character.Character;
+import entity.character.Character;
 import io.Keyboard;
 import dice.Dice;
 
@@ -134,11 +134,6 @@ public abstract class Hero extends Character {
 
     @Override
     public void defend() {
-
-    }
-
-    @Override
-    protected void takeDamage() {
 
     }
 
