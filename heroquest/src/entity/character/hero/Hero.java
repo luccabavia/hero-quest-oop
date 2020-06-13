@@ -1,5 +1,6 @@
 package character.hero;
 
+import bag.Bag;
 import io.Display;
 import map.Map;
 import character.Character;
@@ -11,7 +12,7 @@ public abstract class Hero extends Character {
     private String name;
     private int armor;
     private int[] hands = new int[2]; // 0 = Livre, 1 = Ocupada
-    private Object[] bag;
+    private Bag bag;
 
     public Hero(Map map, int X, int Y, int movementDice, String sprite,
                 String name) {
@@ -44,6 +45,12 @@ public abstract class Hero extends Character {
 
     }
 
+    @Override
+    public String getStatus() {
+        String s = String.format("Name: %s, %s", this.name, super.getStatus());
+        return s;
+    }
+
     /*
     Collect item and add to the bag
      */
@@ -57,7 +64,7 @@ public abstract class Hero extends Character {
      */
     @Override
     public void move() {
-        int steps = Dice().rollRedDice(this.movementDice);
+        int steps = Dice.rollRedDice(this.movementDice);
         for (int i = 0; i < steps; i++) {
             this.takeStep();
             map.drawMap();

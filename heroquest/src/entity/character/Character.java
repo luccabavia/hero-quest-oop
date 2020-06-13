@@ -1,6 +1,6 @@
 package character;
 
-import heroquest.map;
+import map.Map;
 
 public abstract class Character {
 
@@ -39,9 +39,10 @@ public abstract class Character {
     }
 
     public String getStatus() {
-        String s = String.format("Positon: (%d, %d), Attack dice: %d, " +
+        String s = String.format(
+                "Sprite: %s, Positon: (%d, %d), Attack dice: %d, " +
                 "Defense dice: %d, Body points: %d, Mind points: %d",
-                this.X, this.Y, this.attackDice, this.defenseDice,
+                this.sprite, this.X, this.Y, this.attackDice, this.defenseDice,
                 this.bodyPoints, this.mindPoints);
         return s;
     }
