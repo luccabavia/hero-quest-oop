@@ -1,0 +1,16 @@
+unnamed package
+bag
+battle
+dice
+entity
+entity.character
+entity.character.hero
+entity.character.monster
+entity.Item
+entity.Item.equipment.armor
+entity.Item.equipment.spell
+entity.Item.equipment.weapon
+entity.Item.treasure
+entity.scenery
+io
+map
