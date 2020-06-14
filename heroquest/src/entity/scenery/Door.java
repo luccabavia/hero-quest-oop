@@ -1,5 +1,9 @@
 package entity.scenery;
 
+/**
+ * Class for every door that can be placed in the game's map.
+ */
+
 public class Door extends Scenery {
 
     public Door(int x, int y) {
