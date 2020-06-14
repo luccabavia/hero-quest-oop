@@ -1,5 +1,9 @@
 package battle;
 
+/**
+ * Class for instance two chacracter combat
+ */
+
 public class Battle {
 
     private static Battle instance;
