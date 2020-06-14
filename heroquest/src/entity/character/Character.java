@@ -3,6 +3,10 @@ package entity.character;
 import entity.Entity;
 import map.Map;
 
+/**
+ * Parent class for every Character that can be created at the game.
+ */
+
 public abstract class Character extends Entity {
 
     protected Map map;
@@ -45,6 +49,12 @@ public abstract class Character extends Entity {
 
     protected abstract void castSpell();
 
+    /**
+     * Method for get any character status.
+     *
+     * @return a String with all character information
+     */
+    
     public String getStatus() {
         String s = String.format(
                 "Sprite: %s, Positon: (%d, %d), Attack dice: %d, " +
