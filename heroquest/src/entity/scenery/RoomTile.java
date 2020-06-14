@@ -1,5 +1,9 @@
 package entity.scenery;
 
+/**
+ * Class for every corridor inside any room that can be placed in the game's map.
+ */
+
 public class RoomTile extends Scenery {
 
     public RoomTile(int x, int y) {
