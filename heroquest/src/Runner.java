@@ -1,5 +1,5 @@
 /**
- *Class which initialize game  
+ * Class which initialize game  
  */
 public class Runner {
 
