@@ -2,7 +2,7 @@ package dice;
 
 /**
  * Simulates the behaviour of  combat dice, generating randomized outputs for
- * kinds of combat behavior
+ * combat behavior
  */
 
 public enum DiceCombatType {
