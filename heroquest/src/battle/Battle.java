@@ -1,7 +1,7 @@
 package battle;
 
 /**
- * Class for instance two chacracter combat
+ * Define combat interaction between two chacracter
  */
 
 public class Battle {
