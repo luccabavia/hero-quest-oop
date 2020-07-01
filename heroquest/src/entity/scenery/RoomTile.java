@@ -1,5 +1,9 @@
 package entity.scenery;
 
+/**
+ * Class for room floor that can be placed in the game's map.
+ */
+
 public class RoomTile extends Scenery {
 
     public RoomTile(int x, int y) {
