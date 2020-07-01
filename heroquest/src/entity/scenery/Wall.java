@@ -1,7 +1,7 @@
 package entity.scenery;
 
 /**
- * Class for every wall, to create a room inside, that can be placed in the game's map.
+ * Wall object, to separate the inside of a room from other spaces, that can be placed in the game's map.
  */
 
 public class Wall extends Scenery {
