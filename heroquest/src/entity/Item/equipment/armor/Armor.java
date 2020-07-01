@@ -2,7 +2,7 @@ package entity.Item.equipment.armor;
 
 
 /**
- * Class for armor that can be used by the hero at the game.
+ * Class for armor that can be used by heroes at the game.
  */
 public abstract class Armor {
 
