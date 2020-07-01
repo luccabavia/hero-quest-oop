@@ -4,7 +4,7 @@ import entity.Entity;
 import map.Map;
 
 /**
- * Parent class for every Character that can be created at the game.
+ * Definition of a Character that can be created in the game.
  */
 
 public abstract class Character extends Entity {
@@ -50,7 +50,7 @@ public abstract class Character extends Entity {
     protected abstract void castSpell();
 
     /**
-     * Method for get any character status.
+     * Method to get character status.
      *
      * @return a String with all character information
      */
