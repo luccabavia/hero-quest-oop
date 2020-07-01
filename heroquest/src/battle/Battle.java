@@ -1,5 +1,9 @@
 package battle;
 
+/**
+ * Define combat interaction between two chacracter
+ */
+
 public class Battle {
 
     private static Battle instance;
