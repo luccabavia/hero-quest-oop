@@ -7,8 +7,21 @@ import entity.character.Character;
 import io.Keyboard;
 import dice.Dice;
 
+/**
+ * Parent class for any kind of Hero that can be created at the game.
+ */
+
 public abstract class Hero extends Character {
 
+    /**
+     * Constructor method for hero parent class.
+     *
+     * @param String name
+     * @param int armor
+     * @param int[] hands
+     * @param  Bag bag
+     */
+    
     private String name;
     private int armor;
     private int[] hands = new int[2]; // 0 = Livre, 1 = Ocupada
@@ -20,8 +33,8 @@ public abstract class Hero extends Character {
         this.name = name;
     }
 
-    /*
-    Search for items in positions directly around the Hero, counter clockwise
+    /**
+     * Method which searchs for collectible items in positions directly around the Hero, counter clockwise
      */
     public void searchForItems() {
 
