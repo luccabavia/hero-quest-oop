@@ -1,5 +1,9 @@
 package entity.scenery;
 
+/**
+ * Class for every corridor that can be placed in the game's map.
+ */
+
 public class CorridorTile extends Scenery {
 
     public CorridorTile(int x, int y) {
