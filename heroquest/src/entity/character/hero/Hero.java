@@ -34,7 +34,7 @@ public abstract class Hero extends Character {
     }
 
     /**
-      *Method which searchs for collectable items in positions directly around the Hero, counter clockwise
+     * Method which searchs for collectible items in positions directly around the Hero, counter clockwise
      */
     public void searchForItems() {
 
