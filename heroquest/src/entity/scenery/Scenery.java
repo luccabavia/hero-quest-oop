@@ -2,6 +2,10 @@ package entity.scenery;
 
 import entity.Entity;
 
+/**
+ * Parent class for every object that can be a strutcture in the game's map.
+ */
+
 public abstract class Scenery extends Entity {
 
     protected int x;
