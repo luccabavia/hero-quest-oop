@@ -56,6 +56,7 @@ public class Game {
         this.map.setGameMode(MapMode.DEFAULT);
         this.hero = selectHero(HeroType.BARBARIAN);
         this.map.updateVisibility(hero.getPosition());
+        //this.map.viewAllMap();
         try{
         	this.map.setEntity(this.hero);
         } catch (PositionDoesNotExistException e) {

@@ -226,6 +226,15 @@ public class Map {
         this.map[oldX][oldY][1] = null;
     }
     
+    public void viewAllMap() {
+    	for (int i = 0; i < map.length; i++){
+            for (int j = 0; j < map[0].length; j++) {
+            	visible[i][j] = true;	
+            }
+        }
+    }
+    
+    
     public void updateVisibility(int[] pos) {
     	boolean stop = true;
     	
@@ -277,7 +286,7 @@ public class Map {
     			visible[i][pos[1]] = true;
     		}	
 
-    	} d
+    	}
     	
     	stop = true;
     	for (int i = pos[0] - 1; i > 0 && stop; i--) {
