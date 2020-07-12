@@ -12,8 +12,4 @@ public class Dwarf extends Hero {
         this.weapon.add(new ShortSword());
     }
 
-    @Override
-    public void move(int steps) {
-
-    }
 }

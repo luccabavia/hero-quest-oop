@@ -12,9 +12,5 @@ public class Elf extends Hero {
         this.spells.add(new SimpleHeal());
     }
 
-    @Override
-    public void move(int steps) {
-
-    }
 }
 

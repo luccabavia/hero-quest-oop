@@ -11,8 +11,4 @@ public class Barbarian extends Hero {
         this.weapon.add(new LongSword());
     }
 
-    @Override
-    public void move(int steps) {
-
-    }
 }

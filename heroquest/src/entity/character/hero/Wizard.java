@@ -20,9 +20,4 @@ public class Wizard extends Hero {
 
     }
 
-
-    @Override
-    public void move(int steps) {
-
-    }
 }
