@@ -7,17 +7,19 @@ import java.util.Random;
 
 public abstract class Monster extends Character {
 
+    protected int maxSteps;
+
     Monster(Map map, int x, int y, String sprite, int bodyPoints,
-            int attackDice, int defenseDice) {
+            int attackDice, int defenseDice, int maxSteps) {
         super(map, x, y, String.format("\u001b[35m%s\u001b[0m",sprite),
                 bodyPoints, attackDice, defenseDice);
+        this.maxSteps = maxSteps;
     }
 
-    @Override
-    public void move(int steps) {
+    public void move() {
 
-        Random random;
-
+        Random random = new Random();
+        int steps = random.nextInt(this.maxSteps);
         while (steps > 0) {
 
             random = new Random();
