@@ -1,4 +1,4 @@
-package map;
+package exceptions;
 
 public class PositionDoesNotExistException extends Exception {
 

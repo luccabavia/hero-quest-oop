@@ -1,4 +1,4 @@
-package map;
+package exceptions;
 
 public class CannotWalkOverException extends Exception {
 
