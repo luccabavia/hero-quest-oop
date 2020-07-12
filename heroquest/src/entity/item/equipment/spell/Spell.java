@@ -1,12 +1,13 @@
 package entity.item.equipment.spell;
 
 import entity.character.Character;
+import entity.item.Item;
 
 /**
- * Parent class of spells can be created in the game.
+ * Define spells tha can be created in the game.
  */
 
-public abstract class Spell {
+public abstract class Spell implements Item {
 
     private int casts;
 
@@ -27,6 +28,10 @@ public abstract class Spell {
 
     public void castSpell(Character[] targets) {
 
+    }
+
+    public Item collect() {
+        return this;
     }
 
 }
