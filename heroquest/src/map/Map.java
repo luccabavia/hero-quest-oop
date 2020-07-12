@@ -2,11 +2,14 @@ package map;
 
 import entity.Entity;
 import entity.character.Character;
+import entity.character.hero.Hero;
+import entity.character.monster.Monster;
 import entity.character.monster.Skeleton;
 import entity.scenery.*;
+import exceptions.CannotWalkOverException;
+import exceptions.PositionDoesNotExistException;
 import io.Display;
 import io.ImportFromFile;
-import map.MapMode;
 
 import java.util.ArrayList;
 
@@ -15,6 +18,7 @@ public class Map {
     private static MapMode mapMode;
     private static Map instance;
     private Entity[][][] map;
+    private Hero hero;
 
     private Map() {
         this.importMap();
@@ -33,8 +37,9 @@ public class Map {
         this.map = ImportFromFile.importMap(path);
     }
 
-    public void setGameMode(MapMode mapMode) {
+    public int[] setGameMode(MapMode mapMode) {
 
+        int[] startPosition = new int[] {0, 0};
         switch (mapMode) {
             case RANDOM:
                 // mapa aleatorio
@@ -45,7 +50,7 @@ public class Map {
                 this.createStandardMap();
                 break;
         }
-
+        return startPosition;
     }
 
     public static Map getInstance() {
@@ -54,17 +59,6 @@ public class Map {
         }
         return instance;
     }
-
-    // Implementação de singleton antiga
-//    public static Map getInstance(MapMode mode) {
-//        if (mapInstance == null) {
-//            if (mapMode == null) {
-//                mapMode = MapMode.DEFAULT;
-//            }
-//            mapInstance = new Map();
-//        }
-//        return mapInstance;
-//    }
 
     public boolean hasItem(int[] position) {
         return true;
@@ -149,6 +143,15 @@ public class Map {
         return isEmpty && exists;
     }
 
+    public void placeHero(Hero hero) {
+        this.hero = hero;
+        //coloca herói na posição x,y
+    }
+
+    public int[] getHeroPosition() {
+        return this.hero.getPosition();
+    }
+
     private void createStandardMap() {
 
         int[][] skeletonPositions = new int[][] {{12, 18}, {0, 0}, {3, 3},
@@ -167,26 +170,31 @@ public class Map {
 
     }
 
-    public ArrayList<Character> getCharacter() {
+    public ArrayList<Monster> getMonster() {
 
-        ArrayList<Character> chars = new ArrayList<>();
+        ArrayList<Monster> monsters = new ArrayList<>();
         for (int i = 0; i < this.map.length; i++) {
             for (int j = 0; j < this.map[0].length; j++) {
                 if (this.map[i][j][1] != null) {
                     try {
-                        Character character = (Character) this.map[i][j][1];
-                        chars.add((Character) this.map[i][j][1]);
+                        Character Monster = (Monster) this.map[i][j][1];
+                        monsters.add((Monster) this.map[i][j][1]);
                     } catch (ClassCastException e) {
-                        System.out.printf("No character found in position " +
-                                "(%d, %d).\n", i, j);
-                        System.out.println(e);
+//                        Display.print(String.format("No character found in " +
+//                                        "position (%d, %d).\n", i, j));
+//                        System.out.println(e);
                     }
 
                 }
             }
         }
 
-        return chars;
+        return monsters;
+    }
+
+    public boolean hasMonsters() {
+        ArrayList<Monster> monsters = getMonster();
+        return monsters.size() > 0;
     }
 
     public void updateMap(int oldX, int oldY) {
