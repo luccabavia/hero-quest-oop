@@ -12,7 +12,12 @@ public class Keyboard {
      * @return a string containing given input.
      */
     public static String getInput() {
-        System.out.print("Next movement direction (using w, a, s, d keys): ");
+        Scanner scannerString = new Scanner(System.in);
+        return scannerString.next();
+    }
+
+    public static String getInput(String message) {
+        Display.print(message);
         Scanner scannerString = new Scanner(System.in);
         return scannerString.next();
     }
