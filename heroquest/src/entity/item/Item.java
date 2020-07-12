@@ -1,4 +1,7 @@
 package entity.item;
 
-public class Item {
+public interface Item {
+
+    Item collect();
+
 }
