@@ -5,14 +5,11 @@ import entity.item.equipment.spell.Spell;
 import entity.item.equipment.weapon.Weapon;
 import map.Map;
 
-<<<<<<< HEAD
 import java.util.ArrayList;
-=======
+
 /**
  * Definition of a Character that can be created in the game.
  */
->>>>>>> 37f24fad485c5be04696c57cf938cff25b64e3d6
-
 public abstract class Character extends Entity {
 
     protected Map map;
@@ -38,8 +35,6 @@ public abstract class Character extends Entity {
         this.sprite = sprite;
         this.bodyPoints = bodyPoints;
     }
-
-    public abstract void move(int steps);
 
     protected boolean moveNorth() {
         if (this.map.isAvailable( x - 1, y)) {
@@ -103,6 +98,10 @@ public abstract class Character extends Entity {
 
     public void sufferEffect(int value) {
         this.bodyPoints += value;
+    }
+
+    public int getHealth() {
+        return this.bodyPoints;
     }
 
     protected abstract void castSpell();
