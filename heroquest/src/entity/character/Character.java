@@ -3,6 +3,7 @@ package entity.character;
 import entity.Entity;
 import entity.item.equipment.spell.Spell;
 import entity.item.equipment.weapon.Weapon;
+import exceptions.*;
 import map.Map;
 
 import java.util.ArrayList;
@@ -36,60 +37,78 @@ public abstract class Character extends Entity {
         this.bodyPoints = bodyPoints;
     }
 
-    protected boolean moveNorth() {
-        if (this.map.isAvailable( x - 1, y)) {
+    public void moveNorth() throws
+            PositionDoesNotExistException, CannotWalkOverException {
+        try {
+            if(this.map.isAvailable(x - 1, y)) {
+                int oldX = this.x;
+                this.x--;
 
-            int oldX = this.x;
-            this.x--;
-
-//            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
-//                    this.x, this.y);
-            this.map.updateMap(oldX, this.y);
-            return true;
+                //            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
+                //                    this.x, this.y);
+                this.map.updateMap(oldX, this.y);
+            }
+        } catch (PositionDoesNotExistException e){
+            throw e;
+        } catch (CannotWalkOverException e) {
+            throw e;
         }
-        return false;
     }
 
-    protected boolean moveSouth() {
-        if (this.map.isAvailable( x + 1, y)) {
+    public void moveSouth() throws
+            PositionDoesNotExistException, CannotWalkOverException {
+        try {
+            if(this.map.isAvailable(x + 1, y)) {
+                int oldX = this.x;
+                this.x++;
 
-            int oldX = this.x;
-            this.x++;
-//            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
-//                    this.x, this.y);
-
-            this.map.updateMap(oldX, this.y);
-            return true;
+                //                System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
+                //                        this.x, this.y);
+                this.map.updateMap(oldX, this.y);
+            }
+        } catch (PositionDoesNotExistException e){
+            throw e;
+        } catch (CannotWalkOverException e) {
+            throw e;
         }
-        return false;
     }
 
-    protected boolean moveEast() {
-        if (this.map.isAvailable( x, y + 1)) {
 
-            int oldY = this.y;
-            this.y++;
+    public void moveEast() throws
+            PositionDoesNotExistException, CannotWalkOverException {
+        try {
+            if(this.map.isAvailable(x, y + 1)) {
+                int oldY = this.y;
+                this.y++;
 
-//            System.out.printf("Old (%d, %d); New (%d, %d)\n", this.x, oldY,
-//                    this.x, this.y);
-            this.map.updateMap(this.x, oldY);
-            return true;
+                //System.out.printf("Old (%d, %d); New (%d, %d)\n", this.x, oldY,
+                //        this.x, this.y);
+                this.map.updateMap(this.x, oldY);
+            }
+        } catch (PositionDoesNotExistException e){
+            throw e;
+        } catch (CannotWalkOverException e) {
+            throw e;
         }
-        return false;
+
     }
 
-    protected boolean moveWest() {
-        if (this.map.isAvailable( x, y - 1)) {
+    public void moveWest() throws
+            PositionDoesNotExistException, CannotWalkOverException {
+        try {
+            if(this.map.isAvailable(x, y - 1)){
+                int oldY = this.y;
+                this.y--;
 
-            int oldY = this.y;
-            this.y--;
-
-//            System.out.printf("Old (%d, %d); New (%d, %d)\n", this.x, oldY,
-//                    this.x, this.y);
-            this.map.updateMap(this.x, oldY);
-            return true;
+                //            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
+                //                    this.x, this.y);
+                this.map.updateMap(this.x, oldY);
+            }
+        } catch (PositionDoesNotExistException e){
+            throw e;
+        } catch (CannotWalkOverException e) {
+            throw e;
         }
-        return false;
     }
 
     public abstract void attack();
