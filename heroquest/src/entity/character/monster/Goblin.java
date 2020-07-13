@@ -25,9 +25,17 @@ public class Goblin extends Monster {
 
         Random random = new Random();
         int[] positionHero = this.map.getHeroPosition();
-        int steps = random.nextInt(this.maxSteps);
+        int steps = random.nextInt(this.maxSteps) + 1;
+        MovementDirection[] failedAttempts = new MovementDirection[2];
+        boolean failNorth = false;
+        boolean failSouth = false;
+        boolean failEast = false;
+        boolean failWest = false;
+        MovementDirection currDir = null;
+        ArrayList<MovementDirection> failedDirections = new ArrayList<>();
+
         while (steps > 0) {
-            try {
+
                 ArrayList<MovementDirection> directions = new ArrayList<>();
                 if (this.x > positionHero[0]) {
                     directions.add(MovementDirection.NORTH);
@@ -40,10 +48,9 @@ public class Goblin extends Monster {
                     directions.add(MovementDirection.EAST);
                 }
                 steps--;
-                switch (directions.get(
-                        random.nextInt(directions.size())
-                )
-                ) {
+
+            try {
+                switch (directions.get(0)) {
                     case NORTH:
                         this.moveNorth();
                         break;
@@ -57,22 +64,40 @@ public class Goblin extends Monster {
                         this.moveEast();
                         break;
                 }
-            } catch (Exception e) {
+            } catch (PositionDoesNotExistException e){
                 steps++;
-                Display.printWarning(e.getMessage());
+                Display.print(e.getMessage());
+            } catch (CannotWalkOverException e) {
+                steps++;
+                Display.print(e.getMessage());
+
+                try {
+                    switch (directions.get(1)) {
+                        case NORTH:
+                            this.moveNorth();
+                            break;
+                        case SOUTH:
+                            this.moveSouth();
+                            break;
+                        case WEST:
+                            this.moveWest();
+                            break;
+                        case EAST:
+                            this.moveEast();
+                            break;
+                    }
+                } catch (PositionDoesNotExistException e1){
+                    steps = 0;
+                    Display.print(e.getMessage());
+                } catch (CannotWalkOverException e1) {
+                    steps = 0;
+                    Display.print(e.getMessage());
+                } catch (NullPointerException e1) {
+                    steps = 0;
+                    Display.print(e.getMessage());
+                }
             }
-//            } catch (PositionDoesNotExistException e){
-//                steps++;
-//                Display.print(e.getMessage());
-//            } catch (CannotWalkOverException e) {
-//                steps++;
-//                Display.print(e.getMessage());
-//            }
-
-
         }
-
-
     }
 
     @Override
