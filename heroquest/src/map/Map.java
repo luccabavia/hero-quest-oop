@@ -3,6 +3,7 @@ package map;
 import entity.Entity;
 import entity.character.Character;
 import entity.character.hero.Hero;
+import entity.character.monster.Goblin;
 import entity.character.monster.Monster;
 import entity.character.monster.Skeleton;
 import entity.scenery.*;
@@ -19,6 +20,7 @@ public class Map {
     private static Map instance;
     private Entity[][][] map;
     private Hero hero;
+    private boolean visibility[][];
 
     private Map() {
         this.importMap();
@@ -32,9 +34,10 @@ public class Map {
                 currentDir,
                 "heroquest/config/map/default_map_hero_quest.txt"
         );
-//        path = "/Users/lucca.bavia/Development/MCC322/Projeto/hero-quest-oop" +
-//                "/heroquest/config/map/test_map.txt";
+//        path = "/heroquest/config/map/test_map.txt";
         this.map = ImportFromFile.importMap(path);
+
+        visibility = new boolean[map.length][map[0].length];
     }
 
     public int[] setGameMode(MapMode mapMode) {
@@ -66,17 +69,21 @@ public class Map {
 
     public void drawMap() {
         StringBuilder s = new StringBuilder("");
-        String piece = "?";
+        String fog = "??";
         for (int i = 0; i < map.length; i++){
             for (int j = 0; j < map[0].length; j++) {
                 /* Entidade atualmente é uma CLASSE ABSTRATA, podemos trocar
                 * para ITERFACE, usando como exemplo o trabalho feito no
                 * LAB 13
                 */
-                if (map[i][j][1] != null) {
-                    s.append(map[i][j][1].getSprite());
-                } else {
-                    s.append(map[i][j][0].getSprite());
+                if(visibility[i][j]) {
+                    if (map[i][j][1] != null) {
+                        s.append(map[i][j][1].getSprite());
+                    } else {
+                        s.append(map[i][j][0].getSprite());
+                    }
+                }else {
+                    s.append(fog);
                 }
 
                 if (j != map[0].length - 1) {
@@ -127,25 +134,27 @@ public class Map {
 
     }
 
-    public boolean isAvailable(int x, int y) {
+    public boolean isAvailable(int x, int y) throws
+            PositionDoesNotExistException, CannotWalkOverException {
         boolean isEmpty = false;
         boolean exists = false;
         try {
             exists = this.positionExists(x, y);
             isEmpty = this.positionIsEmpty(x, y);
         } catch (PositionDoesNotExistException e){
-            Display.printWarning(e.getMessage());
             exists = false;
+            throw e;
         } catch (CannotWalkOverException e) {
-            Display.printWarning(e.getMessage());
             isEmpty = false;
+            throw e;
         }
         return isEmpty && exists;
     }
 
-    public void placeHero(Hero hero) {
+    public void placeHero(Hero hero) throws
+            CannotWalkOverException, PositionDoesNotExistException {
         this.hero = hero;
-        //coloca herói na posição x,y
+        this.setEntity((Entity) hero);
     }
 
     public int[] getHeroPosition() {
@@ -154,8 +163,9 @@ public class Map {
 
     private void createStandardMap() {
 
-        int[][] skeletonPositions = new int[][] {{12, 18}, {0, 0}, {3, 3},
+        int[][] skeletonPositions = new int[][] {{12, 18}, {1, 1}, {3, 3},
                 {2, 4}};
+        int[][] goblinPositions = new int[][] {{15, 16}};
 
         for (int[] pos: skeletonPositions) {
             this.map[pos[0]][pos[1]][1] = new Skeleton(
@@ -163,6 +173,15 @@ public class Map {
                     pos[0],
                     pos[1]);
         }
+
+        for (int[] pos: goblinPositions) {
+            this.map[pos[0]][pos[1]][1] = new Goblin(
+                    this,
+                    pos[0],
+                    pos[1]);
+        }
+
+
 
     }
 
@@ -192,6 +211,20 @@ public class Map {
         return monsters;
     }
 
+    public void setEntity(Entity ent) throws
+            PositionDoesNotExistException, CannotWalkOverException {
+        int pos[] = ent.getPosition();
+        try {
+            if(isAvailable(pos[0], pos[1]))
+                this.map[pos[0]][pos[1]][1]= ent;
+
+        } catch (PositionDoesNotExistException e) {
+            throw e;
+        } catch (CannotWalkOverException e) {
+            throw e;
+        }
+    }
+
     public boolean hasMonsters() {
         ArrayList<Monster> monsters = getMonster();
         return monsters.size() > 0;
@@ -204,5 +237,71 @@ public class Map {
 
         this.map[pos[0]][pos[1]][1] = ent;
         this.map[oldX][oldY][1] = null;
+    }
+
+    public void viewAllMap() {
+        for (int i = 0; i < map.length; i++){
+            for (int j = 0; j < map[0].length; j++) {
+                visibility[i][j] = true;
+            }
+        }
+    }
+
+    public void updateVisibility() {
+
+        int[] heroPos = this.getHeroPosition();
+        this.visibility[heroPos[0]][heroPos[1]] = true;
+
+        boolean stop = true;
+        for (int i = heroPos[1] + 1; i < this.map[0].length && stop; i++) {
+            try{
+                if((!this.map[heroPos[0]][i][0].getSprite().contains("==") &&
+                        !this.map[heroPos[0]][i][0].getSprite().contains("++"))
+                        || !positionIsEmpty(heroPos[0], i))
+                    stop = false;
+            } catch (CannotWalkOverException e) {
+                stop = false;
+            }
+            visibility[heroPos[0]][i] = true;
+        }
+
+        stop = true;
+        for (int i = heroPos[1] - 1; i > 0 && stop; i--) {
+            try{
+                if((!this.map[heroPos[0]][i][0].getSprite().contains("==")
+                        && !this.map[heroPos[0]][i][0].getSprite().contains("++"))
+                        || !positionIsEmpty(heroPos[0], i))
+                    stop = false;
+            } catch (CannotWalkOverException e) {
+                stop = false;
+            }
+            visibility[heroPos[0]][i] = true;
+        }
+
+        stop = true;
+        for (int i = heroPos[0] + 1; i < this.map.length && stop; i++) {
+            try{
+                if((!this.map[i][heroPos[1]][0].getSprite().contains("==")
+                        && !this.map[i][heroPos[1]][0].getSprite().contains("++"))
+                        ||  !positionIsEmpty(i, heroPos[1]))
+                    stop = false;
+            } catch (CannotWalkOverException e) {
+                stop = false;
+            }
+            visibility[i][heroPos[1]] = true;
+        }
+
+        stop = true;
+        for (int i = heroPos[0] - 1; i > 0 && stop; i--) {
+            try{
+                if((!this.map[i][heroPos[1]][0].getSprite().contains("==")
+                        && !this.map[i][heroPos[1]][0].getSprite().contains("++"))
+                        ||  !positionIsEmpty(i, heroPos[1]))
+                    stop = false;
+            } catch (CannotWalkOverException e) {
+                stop = false;
+            }
+            visibility[i][heroPos[1]] = true;
+        }
     }
 }
