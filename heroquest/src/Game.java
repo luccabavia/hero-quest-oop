@@ -19,8 +19,13 @@ public class Game {
     private Map map;
 
     public Game() {
-        
-        configure();
+        try {
+            configure();
+        } catch (PositionDoesNotExistException e) {
+            Display.print(e.getMessage());
+        } catch (CannotWalkOverException e) {
+            Display.print(e.getMessage());
+        }
 
     }
 
@@ -56,7 +61,6 @@ public class Game {
     private void heroRound() {
         //usePotion()
         heroMovement();
-        drawBoard();
         // changeEquipment()
         // heroAction()
         //drawBoard();
@@ -67,16 +71,20 @@ public class Game {
         //monsterAction()
         monsterMovement();
         drawBoard();
+        Display.print("\nFinal do MONSTER ROUND!");
     }
 
     // Decides whether the map is standard or random
-    private void configure() {
+    private void configure() throws
+            CannotWalkOverException, PositionDoesNotExistException {
         this.map = Map.getInstance();//MapMode.DEFAULT);
         int[] startPosition = this.map.setGameMode(MapMode.DEFAULT);
         do {
             this.hero = selectHero(startPosition);
         } while (this.hero == null);
         this.map.placeHero(this.hero);
+        this.map.updateVisibility();
+        this.map.viewAllMap();
     }
 
     private Hero selectHero(int[] startPosition) {
@@ -129,10 +137,6 @@ public class Game {
 
     }
 
-    private void readInput(){
-        //hero.move();
-    }
-
     private void heroMovement() {
         String command;
         int steps = 0;
@@ -144,7 +148,6 @@ public class Game {
         } while (!command.equalsIgnoreCase("r"));
 
         steps = Dice.rollRedDice(this.hero.getMovementDice());
-
         while (steps > 0) {
             try {
                 Display.print("You have "+ (steps) + " moves left.");
@@ -165,7 +168,7 @@ public class Game {
                         this.hero.moveWest();
                         break;
                 }
-                this.map.updateVisibility(hero.getPosition());
+                this.map.updateVisibility();
                 this.map.drawMap();
             } catch (PositionDoesNotExistException e){
                 steps++;
@@ -179,9 +182,7 @@ public class Game {
 
     private void monsterMovement() {
 
-        ArrayList<Monster> monsters = new ArrayList<>();
-        monsters = this.map.getMonster();
-
+        ArrayList<Monster> monsters = this.map.getMonster();
         for (Monster m : monsters) {
             m.move();
         }
