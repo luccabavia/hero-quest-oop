@@ -70,6 +70,10 @@ public abstract class Hero extends Character {
         return s;
     }
 
+    public int getMovementDice() {
+        return this.movementDice;
+    }
+
     /*
     Collect item and add to the bag
      */
