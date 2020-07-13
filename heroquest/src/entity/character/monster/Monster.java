@@ -1,5 +1,7 @@
 package entity.character.monster;
 
+import exceptions.*;
+import io.Display;
 import map.Map;
 import entity.character.Character;
 
@@ -17,28 +19,45 @@ public abstract class Monster extends Character {
     }
 
     public void move() {
+        System.out.printf("Initial (%d, %d)\n", this.x, this.y);
+
 
         Random random = new Random();
-        int steps = random.nextInt(this.maxSteps);
+        int steps = random.nextInt(this.maxSteps) + 1;
+        System.out.printf("Steps %d", steps);
         while (steps > 0) {
-
-            random = new Random();
-            int number = random.nextInt(4) + 1;
-
-            switch (number) {
-                case 1:
-                    if(this.moveNorth()) { steps--; }
-                    break;
-                case 2:
-                    if(moveSouth()) { steps--; }
-                    break;
-                case 3:
-                    if(moveEast()) { steps--; }
-                    break;
-                default:
-                    if(moveWest()) { steps--; }
-                    break;
+            try {
+                random = new Random();
+                int number = random.nextInt(4) + 1;
+                steps--;
+                switch (number) {
+                    case 1:
+                        this.moveNorth();
+                        break;
+                    case 2:
+                        this.moveSouth();
+                        break;
+                    case 3:
+                        this.moveEast();
+                        break;
+                    default:
+                        this.moveWest();
+                        break;
+                }
+                this.map.drawMap();
+            } catch (PositionDoesNotExistException e){
+                Display.printWarning(e.getMessage());
+                steps++;
+            } catch (CannotWalkOverException e) {
+                Display.printWarning(e.getMessage());
+                steps++;
+            } catch (Exception e) {
+                Display.printWarning(e.getMessage());
+                steps++;
             }
+            System.out.printf("Step %d ; (%d, %d)", steps, this.x, this.y);
+            System.out.println("");
+
         }
     }
 
