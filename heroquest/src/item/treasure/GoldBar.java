@@ -1,8 +1,8 @@
-package entity.item.treasure;
+package item.treasure;
 
 public class GoldBar extends Treasure {
 
     public GoldBar() {
-        super(10);
+        super(10, "GoldBar");
     }
 }
