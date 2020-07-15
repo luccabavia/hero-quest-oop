@@ -1,8 +1,8 @@
 package entity.character.hero;
 
 import map.Map;
-import entity.item.equipment.weapon.*;
-import entity.item.equipment.spell.*;
+import item.equipment.weapon.*;
+import item.equipment.spell.*;
 
 public class Wizard extends Hero {
 
