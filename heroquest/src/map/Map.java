@@ -6,11 +6,16 @@ import entity.character.hero.Hero;
 import entity.character.monster.Goblin;
 import entity.character.monster.Monster;
 import entity.character.monster.Skeleton;
+import entity.chest.Chest;
 import entity.scenery.*;
 import exceptions.CannotWalkOverException;
+import exceptions.NoChestFoundException;
 import exceptions.PositionDoesNotExistException;
 import io.Display;
 import io.ImportFromFile;
+import item.Item;
+import item.equipment.weapon.LongSword;
+import item.equipment.weapon.ShortSword;
 
 import java.util.ArrayList;
 
@@ -63,8 +68,19 @@ public class Map {
         return instance;
     }
 
-    public boolean hasItem(int[] position) {
-        return true;
+    public Chest hasChest(int x, int y) throws
+            PositionDoesNotExistException {
+
+            if (this.positionExists(x, y)) {
+                try {
+                    return (Chest) this.map[x][y][1];
+                } catch (ClassCastException e) {
+                    return null;
+//                    throw new NoChestFoundException(
+//                            String.format("No chest at (%d, %d)", x, y));
+                }
+            }
+            return null;
     }
 
     public void drawMap() {
@@ -112,8 +128,6 @@ public class Map {
     private boolean positionIsEmpty(int x, int y) throws
             CannotWalkOverException {
 //        return this.map[x][y].equals(floor);
-        // REFAZER PENSANDO EM COLOCAR CADA OBJETO DO CENÁRIO COMO ESTÁTICO
-        // TIRAR O OPERADOR INSTANCE OF!!!
         try {
             if (!((Scenery) this.map[x][y][0]).canWalkOver()) {
                 throw new CannotWalkOverException(
@@ -181,7 +195,20 @@ public class Map {
                     pos[1]);
         }
 
+        int[][] chestPosition = new int[][] {
+                {0, 5},
+                {0, 8}
+        };
 
+        Item longSword = new LongSword();
+        Item shortSword = new ShortSword();
+
+        for (int[] pos: chestPosition) {
+            Chest chest = new Chest(pos[0], pos[1]);
+            chest.addItem(longSword);
+            chest.addItem(shortSword);
+            this.map[pos[0]][pos[1]][1] = chest;
+        }
 
     }
 
