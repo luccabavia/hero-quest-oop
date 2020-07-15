@@ -1,4 +1,4 @@
-package entity.item.equipment.spell;
+package item.equipment.spell;
 
 import dice.Dice;
 import entity.character.Character;
@@ -9,7 +9,7 @@ public class SimpleHeal extends Spell {
     private Dice dice;
 
     public SimpleHeal() {
-        super(1, 1);
+        super(1, 1, "SimpleHeal");
     }
 
     @Override

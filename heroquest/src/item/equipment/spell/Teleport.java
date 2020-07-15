@@ -1,4 +1,4 @@
-package entity.item.equipment.spell;
+package item.equipment.spell;
 
 import entity.character.Character;
 import map.MovementDirection;
@@ -8,7 +8,7 @@ import java.util.Random;
 public class Teleport extends Spell {
 
     public Teleport() {
-        super(1, 0);
+        super(1, 0, "Teleport");
     }
 
     @Override

@@ -1,4 +1,4 @@
-package entity.item.equipment.spell;
+package item.equipment.spell;
 
 import entity.character.Character;
 import java.util.Random;
@@ -9,7 +9,7 @@ public class MagicMissile extends Spell {
     private final int MAX_TARGETS = 3;
 
     public MagicMissile() {
-        super(1, -2);
+        super(1, -2, "MagicMissile");
     }
 
     @Override
