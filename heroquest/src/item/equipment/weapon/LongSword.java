@@ -1,4 +1,4 @@
-package entity.item.equipment.weapon;
+package item.equipment.weapon;
 
 public class LongSword extends Weapon {
 
