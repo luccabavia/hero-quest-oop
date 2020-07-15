@@ -1,6 +1,6 @@
 package entity.character.monster;
 
-import entity.item.equipment.weapon.*;
+import item.equipment.weapon.*;
 import map.Map;
 
 public class Skeleton extends Monster {
