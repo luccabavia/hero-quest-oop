@@ -1,7 +1,7 @@
 package entity.character.monster;
 
-import entity.item.equipment.spell.MagicMissile;
-import entity.item.equipment.weapon.Fists;
+import item.equipment.spell.MagicMissile;
+import item.equipment.weapon.Fists;
 import map.Map;
 
 public class SkeletonMage extends Monster {

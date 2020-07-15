@@ -19,12 +19,10 @@ public abstract class Monster extends Character {
     }
 
     public void move() {
-        System.out.printf("Initial (%d, %d)\n", this.x, this.y);
-
-
+//        System.out.printf("Initial (%d, %d)\n", this.x, this.y);
         Random random = new Random();
         int steps = random.nextInt(this.maxSteps) + 1;
-        System.out.printf("Steps %d", steps);
+//        System.out.printf("Steps %d", steps);
         while (steps > 0) {
             try {
                 random = new Random();
@@ -46,17 +44,17 @@ public abstract class Monster extends Character {
                 }
                 this.map.drawMap();
             } catch (PositionDoesNotExistException e){
-                Display.printWarning(e.getMessage());
+//                Display.printWarning(e.getMessage());
                 steps++;
             } catch (CannotWalkOverException e) {
-                Display.printWarning(e.getMessage());
+//                Display.printWarning(e.getMessage());
                 steps++;
             } catch (Exception e) {
-                Display.printWarning(e.getMessage());
+//                Display.printWarning(e.getMessage());
                 steps++;
             }
-            System.out.printf("Step %d ; (%d, %d)", steps, this.x, this.y);
-            System.out.println("");
+//            System.out.printf("Step %d ; (%d, %d)", steps, this.x, this.y);
+//            System.out.println("");
 
         }
     }
