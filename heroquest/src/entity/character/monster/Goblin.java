@@ -1,8 +1,6 @@
 package entity.character.monster;
 
-import entity.character.Character;
-import entity.character.hero.Hero;
-import entity.item.equipment.weapon.*;
+import item.equipment.weapon.*;
 import exceptions.CannotWalkOverException;
 import exceptions.PositionDoesNotExistException;
 import io.Display;
@@ -66,10 +64,10 @@ public class Goblin extends Monster {
                 }
             } catch (PositionDoesNotExistException e){
                 steps++;
-                Display.print(e.getMessage());
+//                Display.print(e.getMessage());
             } catch (CannotWalkOverException e) {
                 steps++;
-                Display.print(e.getMessage());
+//                Display.print(e.getMessage());
 
                 try {
                     switch (directions.get(1)) {
@@ -88,13 +86,13 @@ public class Goblin extends Monster {
                     }
                 } catch (PositionDoesNotExistException e1){
                     steps = 0;
-                    Display.print(e.getMessage());
+//                    Display.print(e.getMessage());
                 } catch (CannotWalkOverException e1) {
                     steps = 0;
-                    Display.print(e.getMessage());
+//                    Display.print(e.getMessage());
                 } catch (NullPointerException e1) {
                     steps = 0;
-                    Display.print(e.getMessage());
+//                    Display.print(e.getMessage());
                 }
             }
         }
