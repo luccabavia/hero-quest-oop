@@ -1,6 +1,6 @@
-package entity.item.equipment.weapon;
+package item.equipment.weapon;
 
-import entity.item.Item;
+import item.Item;
 
 public abstract class Weapon implements Item {
 
@@ -24,8 +24,20 @@ public abstract class Weapon implements Item {
         this.description = description;
     }
 
+    @Override
     public Item collect() {
         return this;
+    }
+
+    @Override
+    public String getCharacteristics() {
+       return String.format("%s -> Hands: %d, Attack: %d, Range: %d",
+               this.name, this.hands, this.attack, this.range);
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     public String getDescription() {

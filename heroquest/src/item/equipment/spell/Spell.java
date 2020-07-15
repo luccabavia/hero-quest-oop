@@ -1,7 +1,7 @@
-package entity.item.equipment.spell;
+package item.equipment.spell;
 
 import entity.character.Character;
-import entity.item.Item;
+import item.Item;
 
 /**
  * Define spells tha can be created in the game.
@@ -17,9 +17,12 @@ public abstract class Spell implements Item {
      * if it is positive the effect is interpreted as a heal.
      */
     protected int lifeEffect;
+    private String name;
 
-    public Spell(int casts, int lifeEffect) {
+    public Spell(int casts, int lifeEffect, String name) {
         this.casts = casts;
+        this.lifeEffect = lifeEffect;
+        this.name = name;
     }
 
     public void castSpell(Character target) {
@@ -34,4 +37,14 @@ public abstract class Spell implements Item {
         return this;
     }
 
+    @Override
+    public String getCharacteristics() {
+        return String.format("%s -> LifeEffect: %d, Casts: %d",
+                this.name, this.lifeEffect, this.casts);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }
