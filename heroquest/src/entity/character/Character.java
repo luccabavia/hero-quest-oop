@@ -1,8 +1,8 @@
 package entity.character;
 
 import entity.Entity;
-import entity.item.equipment.spell.Spell;
-import entity.item.equipment.weapon.Weapon;
+import item.equipment.spell.Spell;
+import item.equipment.weapon.Weapon;
 import exceptions.*;
 import map.Map;
 
@@ -35,6 +35,8 @@ public abstract class Character extends Entity {
         this.y = y;
         this.sprite = sprite;
         this.bodyPoints = bodyPoints;
+        this.attackDice = attackDice;
+        this.defenseDice = defenseDice;
     }
 
     public void moveNorth() throws
@@ -133,10 +135,10 @@ public abstract class Character extends Entity {
     
     public String getStatus() {
         String s = String.format(
-                "Sprite: %s, Positon: (%d, %d), Attack dice: %d, " +
-                "Defense dice: %d, Body points: %d",
-                this.sprite, this.x, this.y, this.attackDice, this.defenseDice,
-                this.bodyPoints);
+                "Sprite: %s, Positon: (%d, %d), Body points: %d, Attack " +
+                        "dice: %d, Defense dice: %d",
+                this.sprite, this.x, this.y, this.bodyPoints, this.attackDice,
+                this.defenseDice);
         return s;
     }
 
