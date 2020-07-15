@@ -3,6 +3,7 @@ import entity.Entity;
 import entity.character.Character;
 import entity.character.hero.*;
 import entity.character.monster.Monster;
+import entity.chest.Chest;
 import io.Display;
 import io.Keyboard;
 import map.Map;
@@ -29,7 +30,7 @@ public class Game {
 
     }
 
-    public void startGameLoop() {
+    public void startGameLoop() throws UnknownItemException {
         exit = false;
         System.out.println("Game started!");
         StringBuilder finalMessage = new StringBuilder("Final message: ");
@@ -58,7 +59,7 @@ public class Game {
         Display.print("Game terminated. Bye!");
     }
 
-    private void heroRound() {
+    private void heroRound() throws UnknownItemException {
         //usePotion()
         heroMovement();
         // changeEquipment()
@@ -71,7 +72,6 @@ public class Game {
         //monsterAction()
         monsterMovement();
         drawBoard();
-        Display.print("\nFinal do MONSTER ROUND!");
     }
 
     // Decides whether the map is standard or random
@@ -137,7 +137,7 @@ public class Game {
 
     }
 
-    private void heroMovement() {
+    private void heroMovement() throws UnknownItemException {
         String command;
         int steps = 0;
         do {
@@ -148,10 +148,13 @@ public class Game {
         } while (!command.equalsIgnoreCase("r"));
 
         steps = Dice.rollRedDice(this.hero.getMovementDice());
-        while (steps > 0) {
+        while (steps > 0 && !this.exit) {
             try {
                 Display.print("You have "+ (steps) + " moves left.");
-                Display.print("Next movement direction (using w, a, s, d keys): ");
+                Display.print(
+                        "Use w, a, s, d keys to move, " +
+                                "collect items with i and exit with q."
+                );
                 String action = Keyboard.getInput();
                 steps--;
                 switch (action) {
@@ -167,6 +170,16 @@ public class Game {
                     case "a":
                         this.hero.moveWest();
                         break;
+                    case "i":
+                        steps++;
+                        this.collectItem();
+                        break;
+                    case "q":
+                        this.exit = true;
+                        break;
+                    default:
+                        steps++;
+                        break;
                 }
                 this.map.updateVisibility();
                 this.map.drawMap();
@@ -178,6 +191,30 @@ public class Game {
                 Display.print(e.getMessage());
             }
         }
+    }
+
+    private void collectItem() throws UnknownItemException {
+
+        Chest chest = this.hero.searchForItems();
+        String input;
+        if (chest != null) {
+            while (chest.getSize() > 0) {
+                chest.displayItems();
+                input = Keyboard.getInput("Which items will you " +
+                        "collect? Press q to stop collection... ");
+                if (input.equalsIgnoreCase("q")) {break;}
+                if (Integer.parseInt(input) < chest.getSize()) {
+                    this.hero.addItemToBag(
+                            chest.collectItems(Integer.parseInt(input))
+                    );
+                }
+            }
+            if (chest.getSize() == 0) {
+                int[] pos = chest.getPosition();
+                this.map.updateMap(pos[0], pos[1]);
+            }
+        }
+        Display.print(this.hero.getStatus());
     }
 
     private void monsterMovement() {

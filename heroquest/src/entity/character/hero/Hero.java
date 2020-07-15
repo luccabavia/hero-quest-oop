@@ -1,7 +1,10 @@
 package entity.character.hero;
 
 import bag.Bag;
+import entity.chest.Chest;
+import exceptions.*;
 import io.Display;
+import item.Item;
 import map.Map;
 import entity.character.Character;
 import io.Keyboard;
@@ -37,12 +40,13 @@ public abstract class Hero extends Character {
         this.name = name;
         this.mindPoints = mindPoints;
         this.movementDice = movementDice;
+        this.bag = new Bag();
     }
 
     /**
      * Method which searchs for collectible items in positions directly around the Hero, counter clockwise
      */
-    public void searchForItems() {
+    public Chest searchForItems() {//throws NoChestFoundException {
 
         int[][] adjacentPositions = new int[][] {
                 {this.x, this.y + 1},       // East
@@ -56,17 +60,31 @@ public abstract class Hero extends Character {
         };
 
         for (int[] i: adjacentPositions) {
-            if (map.hasItem(i)) {
-                this.collectItem(i[0], i[1]);
-                break;
+            try {
+                Chest chest = this.map.hasChest(i[0], i[1]);
+                if (chest != null) { return chest; }
+            } catch (PositionDoesNotExistException e) {
+                continue;
             }
+//            if (map.hasChest(i[0], i[1])) {
+//                this.collectItem(i[0], i[1]);
+//                break;
+//            }
         }
+        return null;
+//        throw new NoChestFoundException("No chests locate around hero");
+    }
 
+    public void addItemToBag(Item item) throws UnknownItemException {
+        this.bag.addItem(item);
     }
 
     @Override
     public String getStatus() {
-        String s = String.format("Name: %s, %s", this.name, super.getStatus());
+        String s = String.format("Name: %s, %s, Movement dice: %d, " +
+                        "Mind points: %s, Bag contents: %s" +
+                        "", this.name, super.getStatus(), this.movementDice,
+                this.mindPoints, this.bag.getStatus());
         return s;
     }
 
@@ -74,10 +92,11 @@ public abstract class Hero extends Character {
         return this.movementDice;
     }
 
+
     /*
     Collect item and add to the bag
      */
-    public void collectItem(int x, int y) {
+    public void collectItem() {
 
     }
 
