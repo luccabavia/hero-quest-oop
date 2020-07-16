@@ -1,17 +1,17 @@
+import dice.Dice;
 import entity.Entity;
 import entity.character.Character;
 import entity.character.hero.*;
-import entity.character.monster.*;
-import exception.CannotWalkOverException;
-import exception.PositionDoesNotExistException;
+import entity.character.monster.Monster;
+import entity.chest.Chest;
+import io.Display;
+import io.Keyboard;
 import map.Map;
 import map.MapMode;
-import io.*;
-import dice.*;
+import exceptions.*;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Scanner;
 
 public class Game {
 
@@ -21,58 +21,113 @@ public class Game {
 
     public Game() {
         try {
-        	configure();
+            configure();
         } catch (PositionDoesNotExistException e) {
-    		Display.print(e.getMessage());
-    	} catch (CannotWalkOverException e) {
-    		Display.print(e.getMessage());
-    	}	
+            Display.print(e.getMessage());
+        } catch (CannotWalkOverException e) {
+            Display.print(e.getMessage());
+        }
 
     }
 
-    public void start() {
+    public void startGameLoop() throws UnknownItemException {
         exit = false;
         System.out.println("Game started!");
+        StringBuilder finalMessage = new StringBuilder("Final message: ");
 
         int i = 0;
         while (!exit) {
             drawBoard();
-            //readInput();
-            movementPhase();
+            if (this.hero.getHealth() > 0){
+                heroRound();
+            } else {
+                finalMessage.append("You have died! You loose!!");
+                break;
+            }
+            if (this.map.hasMonsters()) {
+                monsterRound();
+            } else {
+                finalMessage.append("All monsters killed! You win!!");
+                break;
+            }
             i++;
-            //Scanner keyboard = new Scanner(System.in);
-            //System.out.print("Enter the command: ");
-			//String command = keyboard.nextLine();
             if (i > 20) {
                 exit = true;
             }
         }
-        System.out.println("Game terminated. Bye!");
+        Display.print(finalMessage.toString());
+        Display.print("Game terminated. Bye!");
+    }
+
+    private void heroRound() throws UnknownItemException {
+        //usePotion()
+        heroMovement();
+        // changeEquipment()
+        heroAction();
+        //drawBoard();
+
+    }
+
+    private void monsterRound() {
+        //monsterAction()
+        monsterMovement();
     }
 
     // Decides whether the map is standard or random
-    private void configure() throws PositionDoesNotExistException, CannotWalkOverException {
+    private void configure() throws
+            CannotWalkOverException, PositionDoesNotExistException {
         this.map = Map.getInstance();//MapMode.DEFAULT);
-        this.map.setGameMode(MapMode.DEFAULT);
-        this.hero = selectHero(HeroType.BARBARIAN);
-        this.map.updateVisibility(hero.getPosition());
+        int[] startPosition = this.map.setGameMode(MapMode.DEFAULT);
+        do {
+            this.hero = selectHero(startPosition);
+        } while (this.hero == null);
+        this.map.placeHero(this.hero);
+        this.map.updateVisibility();
         //this.map.viewAllMap();
-        try{
-        	this.map.setEntity(this.hero);
-        } catch (PositionDoesNotExistException e) {
-    		throw e;
-    	} catch (CannotWalkOverException e) {
-    		throw e;
-    	}	
     }
 
-    private Hero selectHero(HeroType heroType) {
-    	switch(heroType) {
-    		case BARBARIAN:
-    			return new Barbarian(this.map, 0, 0, "Claudio") ;
-    		default:
-    			return null;	
-    	}
+    private Hero selectHero(int[] startPosition) {
+
+        Hero hero = null;
+        HeroType heroType = this.chooseHero();
+        String heroName = Keyboard.getInput("Escolha o nome do seu herói: ");
+        switch (heroType) {
+            case ELF:
+                hero = new Elf(this.map, startPosition[0],
+                        startPosition[1], heroName);
+                break;
+            case DWARF:
+                hero = new Dwarf(this.map, startPosition[0],
+                        startPosition[1], heroName);
+                break;
+            case WIZARD:
+                hero = new Wizard(this.map, startPosition[0],
+                        startPosition[1], heroName);
+                break;
+            case BARBARIAN:
+                hero = new Barbarian(this.map, startPosition[0],
+                        startPosition[1], heroName);
+                break;
+        }
+
+        return hero;
+    }
+
+    private HeroType chooseHero() {
+        Display.print("Available hero types: " +
+                "\n0 - Elf\n1 - Dwarf\n2 - Wizard\n3 - Barbarian");
+        String choice = Keyboard.getInput("Choose your hero type: ");
+        switch (choice) {
+            case "0":
+                return HeroType.ELF;
+            case "1":
+                return HeroType.DWARF;
+            case "2":
+                return HeroType.WIZARD;
+            case "3":
+                return HeroType.BARBARIAN;
+        }
+        return null;
     }
 
     private void drawBoard(){
@@ -81,64 +136,109 @@ public class Game {
 
     }
 
-    private void readInput(){
-    }
+    private void heroMovement() throws UnknownItemException {
+        String command;
+        int steps = 0;
+        do {
 
-    private void movementPhase() {
+            Display.print("Press r to roll the Dice");
+            command = Keyboard.getInput();
 
-    	moveHero();
-        Random rand = new Random();
+        } while (!command.equalsIgnoreCase("r"));
 
-        ArrayList<Character> chars = new ArrayList<>();
-        chars = this.map.getCharacter();
-
-        for (Character c : chars) {
-            c.move(1);//rand.nextInt(6) + 1);
-
-        }
-
-    }
-    private void moveHero() {
-            String command;
-            int steps = 0;
-            do {
-
-                Display.print("Press r to roll the Dice");
-                command = Keyboard.getInput();
-                
-            } while (!command.equalsIgnoreCase("r"));
-            
-            steps = Dice.rollRedDice(hero.getMovementDice());
-
-            while (steps > 0) {
-            	try {
-	               Display.print("You have "+ (steps) + " moves left.");
-	               Display.print("Next movement direction (using w, a, s, d keys): ");
-	               String action = Keyboard.getInput();
-	               steps--;
-	               switch (action) {
-	                case "w":
-	                    this.hero.moveNorth();
-	                    break;
-	                case "s":
-	                    this.hero.moveSouth();
-	                    break;
-	                case "d":
-	                    this.hero.moveEast();
-	                    break;
-	                case "a":
-	                	this.hero.moveWest();
-	                    break;
-	               }
-	               this.map.updateVisibility(hero.getPosition());
-	               this.map.drawMap();
-		    	} catch (PositionDoesNotExistException e){
-		    		steps++;
-		    		Display.print(e.getMessage());
-		        } catch (CannotWalkOverException e) {
-		        	steps++;
-		        	Display.print(e.getMessage());
-		        } 
+        steps = Dice.rollRedDice(this.hero.getMovementDice());
+        while (steps > 0 && !this.exit) {
+            try {
+                Display.print("You have "+ (steps) + " moves left.");
+                Display.print(
+                        "Use w, a, s, d keys to move, " +
+                                "collect items with i and exit with q."
+                );
+                String action = Keyboard.getInput();
+                steps--;
+                switch (action) {
+                    case "w":
+                        this.hero.moveNorth();
+                        break;
+                    case "s":
+                        this.hero.moveSouth();
+                        break;
+                    case "d":
+                        this.hero.moveEast();
+                        break;
+                    case "a":
+                        this.hero.moveWest();
+                        break;
+                    case "i":
+                        steps++;
+                        this.collectItem();
+                        break;
+                    case "q":
+                        this.exit = true;
+                        break;
+                    default:
+                        steps++;
+                        break;
+                }
+                this.map.updateVisibility();
+                this.map.drawMap();
+            } catch (PositionDoesNotExistException e){
+                steps++;
+                Display.print(e.getMessage());
+            } catch (CannotWalkOverException e) {
+                steps++;
+                Display.print(e.getMessage());
             }
         }
+    }
+
+    private void heroAction() {
+    	heroAttack();
+    }
+    
+    private void heroAttack() {
+    	
+    	ArrayList<Monster> monsters = this.map.getMonsterToAttack(2);
+    	int counter = 0;
+    	int[] monsterPosition;
+        for (Monster m : monsters) {
+        	 monsterPosition = m.getPosition();
+        	 System.out.printf("Monster (%d) Position: x:%d, y:%d\n", counter, monsterPosition[0], monsterPosition[1]);
+        	 counter++;
+        }
+    }
+    private void collectItem() throws UnknownItemException {
+
+        Chest chest = this.hero.searchForItems();
+        String input;
+        if (chest != null) {
+            while (chest.getSize() > 0) {
+                chest.displayItems();
+                input = Keyboard.getInput("Which items will you " +
+                        "collect? Press q to stop collection... ");
+                if (input.equalsIgnoreCase("q")) {break;}
+                if (Integer.parseInt(input) < chest.getSize()) {
+                    this.hero.addItemToBag(
+                            chest.collectItems(Integer.parseInt(input))
+                    );
+                }
+            }
+            if (chest.getSize() == 0) {
+                int[] pos = chest.getPosition();
+                this.map.updateMap(pos[0], pos[1]);
+            }
+        }
+        Display.print(this.hero.getStatus());
+    }
+
+    private void monsterMovement() {
+
+    	
+    	ArrayList<Monster> monsters = this.map.getMonsterToAttack(2);
+        monsters = this.map.getMonster();
+        for (Monster m : monsters) {
+            m.move();
+        }
+
+    }
 }

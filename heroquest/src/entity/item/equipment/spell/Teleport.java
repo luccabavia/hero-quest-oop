@@ -1,6 +1,9 @@
 package entity.item.equipment.spell;
 
 import entity.character.Character;
+import map.MovementDirection;
+
+import java.util.Random;
 
 public class Teleport extends Spell {
 
@@ -10,6 +13,12 @@ public class Teleport extends Spell {
 
     @Override
     public void castSpell(Character target) {
-        //target.getVisi
+        Random rand = new Random();
+        int steps = rand.nextInt(6);
+
+        MovementDirection direction = MovementDirection.values()[
+                rand.nextInt(4)
+                ];
+
     }
 }

@@ -1,7 +1,7 @@
 package entity.character.hero;
 
 import map.Map;
-import entity.item.equipment.weapon.*;
+import item.equipment.weapon.*;
 
 public class Barbarian extends Hero {
 
@@ -11,8 +11,4 @@ public class Barbarian extends Hero {
         this.weapon.add(new LongSword());
     }
 
-    @Override
-    public void move(int steps) {
-
-    }
 }

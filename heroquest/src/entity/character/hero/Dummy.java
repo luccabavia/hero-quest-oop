@@ -10,8 +10,4 @@ public class Dummy extends Hero {
                 2, 2, movementDice, "Dummy");
     }
 
-    @Override
-    public void move(int steps) {
-
-    }
 }

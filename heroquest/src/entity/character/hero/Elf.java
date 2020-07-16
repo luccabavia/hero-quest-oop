@@ -1,8 +1,8 @@
 package entity.character.hero;
 
-import entity.item.equipment.spell.*;
+import item.equipment.spell.*;
 import map.Map;
-import entity.item.equipment.weapon.*;
+import item.equipment.weapon.*;
 
 public class Elf extends Hero {
     public Elf(Map map, int x, int y, String name) {
@@ -12,9 +12,5 @@ public class Elf extends Hero {
         this.spells.add(new SimpleHeal());
     }
 
-    @Override
-    public void move(int steps) {
-
-    }
 }
 

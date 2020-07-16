@@ -3,10 +3,10 @@ package battle;
 import entity.character.Character;
 import dice.*;
 import io.Keyboard;
+
 /**
  * Define combat interaction between two chacracter
  */
-
 public class Battle {
 
     private static Battle instance;

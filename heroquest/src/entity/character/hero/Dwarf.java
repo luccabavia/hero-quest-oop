@@ -1,8 +1,7 @@
 package entity.character.hero;
 
-import entity.item.equipment.weapon.ShortSword;
+import item.equipment.weapon.ShortSword;
 import map.Map;
-import entity.item.equipment.weapon.*;
 
 public class Dwarf extends Hero {
 
@@ -12,8 +11,4 @@ public class Dwarf extends Hero {
         this.weapon.add(new ShortSword());
     }
 
-    @Override
-    public void move(int steps) {
-
-    }
 }

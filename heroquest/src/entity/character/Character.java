@@ -1,16 +1,16 @@
 package entity.character;
 
 import entity.Entity;
-import entity.item.equipment.spell.Spell;
-import entity.item.equipment.weapon.Weapon;
+import item.equipment.spell.Spell;
+import item.equipment.weapon.Weapon;
+import exceptions.*;
 import map.Map;
-import exception.*;
 
 import java.util.ArrayList;
+
 /**
  * Definition of a Character that can be created in the game.
  */
-
 public abstract class Character extends Entity {
 
     protected Map map;
@@ -35,70 +35,77 @@ public abstract class Character extends Entity {
         this.y = y;
         this.sprite = sprite;
         this.bodyPoints = bodyPoints;
+        this.attackDice = attackDice;
+        this.defenseDice = defenseDice;
     }
 
-    public abstract void move(int steps);
+    public void moveNorth() throws
+            PositionDoesNotExistException, CannotWalkOverException {
+        try {
+            if(this.map.isAvailable(x - 1, y)) {
+                int oldX = this.x;
+                this.x--;
 
-    public void moveNorth() throws PositionDoesNotExistException, CannotWalkOverException {
-        try {	
-        	if(this.map.isAvailable(x - 1, y)) {
-	    		int oldX = this.x;
-	            this.x--;
-	
-	//            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
-	//                    this.x, this.y);
-	            this.map.updateMap(oldX, this.y);
-        	}
+                //            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
+                //                    this.x, this.y);
+                this.map.updateMap(oldX, this.y);
+            }
         } catch (PositionDoesNotExistException e){
             throw e;
         } catch (CannotWalkOverException e) {
             throw e;
         }
     }
-    public void moveSouth() throws PositionDoesNotExistException, CannotWalkOverException {
-            try {	
-            	if(this.map.isAvailable(x + 1, y)) {
-	        		int oldX = this.x;
-	                this.x++;
-	
-	//                System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
-	//                        this.x, this.y);
-	                this.map.updateMap(oldX, this.y);
-            	}
-            } catch (PositionDoesNotExistException e){
-                throw e;
-            } catch (CannotWalkOverException e) {
-                throw e;
-            } 
-    }
 
-    public void moveEast() throws PositionDoesNotExistException, CannotWalkOverException {
-        try {	
-    		if(this.map.isAvailable(x, y + 1)) {
-	    		int oldY = this.y;
-	            this.y++;
-	
-	          //System.out.printf("Old (%d, %d); New (%d, %d)\n", this.x, oldY,
-	          //        this.x, this.y);
-	            this.map.updateMap(this.x, oldY);
-    		}    
+    public void moveSouth() throws
+            PositionDoesNotExistException, CannotWalkOverException {
+        try {
+            if(this.map.isAvailable(x + 1, y)) {
+                int oldX = this.x;
+                this.x++;
+
+                //                System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
+                //                        this.x, this.y);
+                this.map.updateMap(oldX, this.y);
+            }
         } catch (PositionDoesNotExistException e){
             throw e;
         } catch (CannotWalkOverException e) {
             throw e;
-        } 
-    
+        }
     }
-    public void moveWest() throws PositionDoesNotExistException, CannotWalkOverException {
-        try {	
-        	if(this.map.isAvailable(x, y - 1)){
-	    		int oldY = this.y;
-	            this.y--;
-	
-	//            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
-	//                    this.x, this.y);
-	            this.map.updateMap(this.x, oldY);
-        	}
+
+
+    public void moveEast() throws
+            PositionDoesNotExistException, CannotWalkOverException {
+        try {
+            if(this.map.isAvailable(x, y + 1)) {
+                int oldY = this.y;
+                this.y++;
+
+                //System.out.printf("Old (%d, %d); New (%d, %d)\n", this.x, oldY,
+                //        this.x, this.y);
+                this.map.updateMap(this.x, oldY);
+            }
+        } catch (PositionDoesNotExistException e){
+            throw e;
+        } catch (CannotWalkOverException e) {
+            throw e;
+        }
+
+    }
+
+    public void moveWest() throws
+            PositionDoesNotExistException, CannotWalkOverException {
+        try {
+            if(this.map.isAvailable(x, y - 1)){
+                int oldY = this.y;
+                this.y--;
+
+                //            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
+                //                    this.x, this.y);
+                this.map.updateMap(this.x, oldY);
+            }
         } catch (PositionDoesNotExistException e){
             throw e;
         } catch (CannotWalkOverException e) {
@@ -114,6 +121,10 @@ public abstract class Character extends Entity {
         this.bodyPoints += value;
     }
 
+    public int getHealth() {
+        return this.bodyPoints;
+    }
+
     protected abstract void castSpell();
 
     /**
@@ -124,10 +135,10 @@ public abstract class Character extends Entity {
     
     public String getStatus() {
         String s = String.format(
-                "Sprite: %s, Positon: (%d, %d), Attack dice: %d, " +
-                "Defense dice: %d, Body points: %d",
-                this.sprite, this.x, this.y, this.attackDice, this.defenseDice,
-                this.bodyPoints);
+                "Sprite: %s, Positon: (%d, %d), Body points: %d, Attack " +
+                        "dice: %d, Defense dice: %d",
+                this.sprite, this.x, this.y, this.bodyPoints, this.attackDice,
+                this.defenseDice);
         return s;
     }
 

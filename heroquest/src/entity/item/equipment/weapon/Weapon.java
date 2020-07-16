@@ -1,6 +1,8 @@
 package entity.item.equipment.weapon;
 
-public abstract class Weapon {
+import entity.item.Item;
+
+public abstract class Weapon implements Item {
 
     private String name;
     private int hands;
@@ -20,6 +22,10 @@ public abstract class Weapon {
 
     protected void setDescription(String description) {
         this.description = description;
+    }
+
+    public Item collect() {
+        return this;
     }
 
     public String getDescription() {
