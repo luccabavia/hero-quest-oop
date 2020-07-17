@@ -42,20 +42,9 @@ public abstract class Monster extends Character {
                         this.moveWest();
                         break;
                 }
-//                this.map.drawMap();
-            } catch (PositionDoesNotExistException e){
-//                Display.printWarning(e.getMessage());
+            } catch (PositionDoesNotExistException| CannotWalkOverException| IsTrapException e){
                 steps++;
-            } catch (CannotWalkOverException e) {
-//                Display.printWarning(e.getMessage());
-                steps++;
-            } catch (Exception e) {
-//                Display.printWarning(e.getMessage());
-                steps++;
-            }
-//            System.out.printf("Step %d ; (%d, %d)", steps, this.x, this.y);
-//            System.out.println("");
-
+            }  
         }
     }
 
