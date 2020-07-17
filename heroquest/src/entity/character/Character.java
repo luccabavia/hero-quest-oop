@@ -40,7 +40,7 @@ public abstract class Character extends Entity {
     }
 
     public void moveNorth() throws
-            PositionDoesNotExistException, CannotWalkOverException {
+            PositionDoesNotExistException, CannotWalkOverException, IsTrapException {
         try {
             if(this.map.isAvailable(x - 1, y)) {
                 int oldX = this.x;
@@ -50,15 +50,13 @@ public abstract class Character extends Entity {
                 //                    this.x, this.y);
                 this.map.updateMap(oldX, this.y);
             }
-        } catch (PositionDoesNotExistException e){
+        } catch (PositionDoesNotExistException| CannotWalkOverException| IsTrapException e){
             throw e;
-        } catch (CannotWalkOverException e) {
-            throw e;
-        }
+        } 
     }
 
     public void moveSouth() throws
-            PositionDoesNotExistException, CannotWalkOverException {
+            PositionDoesNotExistException, CannotWalkOverException, IsTrapException {
         try {
             if(this.map.isAvailable(x + 1, y)) {
                 int oldX = this.x;
@@ -68,16 +66,14 @@ public abstract class Character extends Entity {
                 //                        this.x, this.y);
                 this.map.updateMap(oldX, this.y);
             }
-        } catch (PositionDoesNotExistException e){
+        } catch (PositionDoesNotExistException| CannotWalkOverException| IsTrapException e){
             throw e;
-        } catch (CannotWalkOverException e) {
-            throw e;
-        }
+        } 
     }
 
 
     public void moveEast() throws
-            PositionDoesNotExistException, CannotWalkOverException {
+            PositionDoesNotExistException, CannotWalkOverException, IsTrapException {
         try {
             if(this.map.isAvailable(x, y + 1)) {
                 int oldY = this.y;
@@ -87,16 +83,14 @@ public abstract class Character extends Entity {
                 //        this.x, this.y);
                 this.map.updateMap(this.x, oldY);
             }
-        } catch (PositionDoesNotExistException e){
+        } catch (PositionDoesNotExistException| CannotWalkOverException| IsTrapException e){
             throw e;
-        } catch (CannotWalkOverException e) {
-            throw e;
-        }
+        } 
 
     }
 
     public void moveWest() throws
-            PositionDoesNotExistException, CannotWalkOverException {
+            PositionDoesNotExistException, CannotWalkOverException, IsTrapException {
         try {
             if(this.map.isAvailable(x, y - 1)){
                 int oldY = this.y;
@@ -106,11 +100,9 @@ public abstract class Character extends Entity {
                 //                    this.x, this.y);
                 this.map.updateMap(this.x, oldY);
             }
-        } catch (PositionDoesNotExistException e){
+        } catch (PositionDoesNotExistException| CannotWalkOverException| IsTrapException e){
             throw e;
-        } catch (CannotWalkOverException e) {
-            throw e;
-        }
+        } 
     }
 
     public abstract void attack();
