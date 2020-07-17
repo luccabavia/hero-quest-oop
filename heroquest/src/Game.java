@@ -4,6 +4,7 @@ import entity.character.Character;
 import entity.character.hero.*;
 import entity.character.monster.Monster;
 import entity.chest.Chest;
+import entity.trap.Trap;
 import io.Display;
 import io.Keyboard;
 import map.Map;
@@ -22,9 +23,7 @@ public class Game {
     public Game() {
         try {
             configure();
-        } catch (PositionDoesNotExistException e) {
-            Display.print(e.getMessage());
-        } catch (CannotWalkOverException e) {
+        } catch (PositionDoesNotExistException | IsTrapException | CannotWalkOverException e) {
             Display.print(e.getMessage());
         }
 
@@ -38,28 +37,26 @@ public class Game {
         int i = 0;
         while (!exit) {
             drawBoard();
-            if (this.hero.getHealth() > 0){
-                heroRound();
-            } else {
-                finalMessage.append("You have died! You loose!!");
+            try {
+	            heroRound();
+	            monsterRound();
+	            i++;
+	            if (i > 20) {
+	                exit = true;
+	            }
+            } catch (MonstersDiedException e) {
+            	finalMessage.append("All monsters killed! You win!!");
+            	break;
+        	} catch	(HeroDiedException e){
+        		finalMessage.append("You have died! You loose!!");
                 break;
-            }
-            if (this.map.hasMonsters()) {
-                monsterRound();
-            } else {
-                finalMessage.append("All monsters killed! You win!!");
-                break;
-            }
-            i++;
-            if (i > 20) {
-                exit = true;
-            }
+        	}
         }
         Display.print(finalMessage.toString());
         Display.print("Game terminated. Bye!");
     }
 
-    private void heroRound() throws UnknownItemException {
+    private void heroRound() throws UnknownItemException, HeroDiedException{
         //usePotion()
         heroMovement();
         // changeEquipment()
@@ -68,14 +65,19 @@ public class Game {
 
     }
 
-    private void monsterRound() {
-        //monsterAction()
-        monsterMovement();
+    private void monsterRound() throws MonstersDiedException {
+        if(this.map.hasMonsters()) {
+        	monsterAction();
+        	monsterMovement();
+        }
+        else {
+        	throw new MonstersDiedException();
+        }
     }
 
     // Decides whether the map is standard or random
     private void configure() throws
-            CannotWalkOverException, PositionDoesNotExistException {
+            CannotWalkOverException, PositionDoesNotExistException, IsTrapException {
         this.map = Map.getInstance();//MapMode.DEFAULT);
         int[] startPosition = this.map.setGameMode(MapMode.DEFAULT);
         do {
@@ -131,14 +133,15 @@ public class Game {
     }
 
     private void drawBoard(){
-        //Display.print(hero.getStatus());
         this.map.drawMap();
+        Display.print(hero.getStatus());
 
     }
 
-    private void heroMovement() throws UnknownItemException {
+    private void heroMovement() throws UnknownItemException, HeroDiedException {
         String command;
         int steps = 0;
+        String action= new String();
         do {
 
             Display.print("Press r to roll the Dice");
@@ -154,7 +157,7 @@ public class Game {
                         "Use w, a, s, d keys to move, " +
                                 "collect items with i and exit with q."
                 );
-                String action = Keyboard.getInput();
+                action = Keyboard.getInput();
                 steps--;
                 switch (action) {
                     case "w":
@@ -182,13 +185,43 @@ public class Game {
                 }
                 this.map.updateVisibility();
                 this.map.drawMap();
-            } catch (PositionDoesNotExistException e){
+            } catch (PositionDoesNotExistException  |CannotWalkOverException e){
                 steps++;
                 Display.print(e.getMessage());
-            } catch (CannotWalkOverException e) {
-                steps++;
-                Display.print(e.getMessage());
-            }
+            } catch (IsTrapException e) {
+            	
+            	int damage = 0;
+            	int[] heroPosition = this.hero.getPosition();
+            	Display.print(this.hero.getStatus());
+	             try {   
+		                switch (action) {
+		                case "w":
+		                	damage = this.map.trapEffect(heroPosition[0] - 1, heroPosition[1]);
+		                    this.hero.moveNorth();
+		                    break;
+		                case "s":
+		                	damage = this.map.trapEffect(heroPosition[0] + 1, heroPosition[1]);
+		                    this.hero.moveSouth();
+		                    break;
+		                case "d":
+		                	damage = this.map.trapEffect(heroPosition[0], heroPosition[1] + 1);
+		                    this.hero.moveEast();
+		                    break;
+		                case "a":
+		                	damage = this.map.trapEffect(heroPosition[0], heroPosition[1] - 1);
+		                    this.hero.moveWest();
+		                    break;
+		            }
+		            System.out.printf("GOTCHA!! You Suffer %d Damage from a Trap\n", damage);	   
+		            Display.print(this.hero.getStatus());
+		            this.map.updateVisibility();
+		            this.map.drawMap();   
+	             } catch (PositionDoesNotExistException | CannotWalkOverException | IsTrapException e1){
+	                 steps++;
+	             }
+           }
+         if (this.hero.getHealth() <= 0)
+        	 throw new HeroDiedException();
         }
     }
 
@@ -196,9 +229,24 @@ public class Game {
     	heroAttack();
     }
     
+    private void monsterAction() {
+    	
+    	ArrayList<Monster> monsters = this.map.getAttackersMonsters();
+    	int counter = 0;
+    	int[] monsterPosition;
+    	System.out.println("------------------Monsters Attackers ----------------");
+        for (Monster m : monsters) {
+        	 monsterPosition = m.getPosition();
+        	 System.out.printf("Monster (%d) Position: x:%d, y:%d\n", counter, monsterPosition[0], monsterPosition[1]);
+        	 counter++;
+        }
+        Keyboard.getInput("Digite para continuar"); 
+    }
+    
     private void heroAttack() {
     	
-    	ArrayList<Monster> monsters = this.map.getMonsterToAttack(2);
+    	//Função que confere os monstros dentro do range do herói usei o 2 como teste
+    	ArrayList<Monster> monsters = this.map.getMonstersToAttack(2);
     	int counter = 0;
     	int[] monsterPosition;
         for (Monster m : monsters) {
@@ -207,6 +255,7 @@ public class Game {
         	 counter++;
         }
     }
+    
     private void collectItem() throws UnknownItemException {
 
         Chest chest = this.hero.searchForItems();
@@ -234,8 +283,7 @@ public class Game {
     private void monsterMovement() {
 
     	
-    	ArrayList<Monster> monsters = this.map.getMonsterToAttack(2);
-        monsters = this.map.getMonster();
+    	ArrayList<Monster> monsters = this.map.getMonster();
         for (Monster m : monsters) {
             m.move();
         }
