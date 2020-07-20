@@ -11,14 +11,12 @@ import java.util.ArrayList;
 /**
  * Definition of a Character that can be created in the game.
  */
-public abstract class Character extends Entity {
+public abstract class Character extends Entity implements WeaponUser {
 
     protected Map map;
     protected int attackDice;
     protected int defenseDice;
     protected int bodyPoints;
-    protected ArrayList<Weapon> weapon = new ArrayList<>();
-    protected ArrayList<Spell> spells = new ArrayList<>();
 
     /**
      * Constructor method for character parent class.
@@ -38,6 +36,8 @@ public abstract class Character extends Entity {
         this.attackDice = attackDice;
         this.defenseDice = defenseDice;
     }
+
+    protected abstract void setStartingEquipment();
 
     public void moveNorth() throws
             PositionDoesNotExistException, CannotWalkOverException {
@@ -74,7 +74,6 @@ public abstract class Character extends Entity {
             throw e;
         }
     }
-
 
     public void moveEast() throws
             PositionDoesNotExistException, CannotWalkOverException {
@@ -113,26 +112,32 @@ public abstract class Character extends Entity {
         }
     }
 
-    public abstract void attack();
+    public abstract int getAttack();
 
-    public abstract void defend();
+    public abstract int getDefense();
 
+    /**
+     * Inflict effect into character's body points.
+     * Effect can be positive, as a heal, or negative, as damage taken.
+     * @param value int summed/subtracted to character's health
+     */
     public void sufferEffect(int value) {
         this.bodyPoints += value;
     }
 
+    /**
+     * Get amount of body points the character currently has
+     * @return int character's body points
+     */
     public int getHealth() {
         return this.bodyPoints;
     }
-
-    protected abstract void castSpell();
 
     /**
      * Method to get character status.
      *
      * @return a String with all character information
      */
-    
     public String getStatus() {
         String s = String.format(
                 "Sprite: %s, Positon: (%d, %d), Body points: %d, Attack " +
