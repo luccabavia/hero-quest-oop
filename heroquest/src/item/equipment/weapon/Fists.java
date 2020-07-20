@@ -3,13 +3,13 @@ package item.equipment.weapon;
 public class Fists extends Weapon {
 
     public Fists(){
-        super("Fists", 2, 2, 1, 999);
+        super("Fists", 1, 0, 1, 9999);
         this.setDescription();
     }
 
     private void setDescription() {
         String description =
-                "Hardened fists of an adventurer, these hands " +
+                "Hardened fists, these hands " +
                 "have seen many battles.";
         this.setDescription(description);
     }
