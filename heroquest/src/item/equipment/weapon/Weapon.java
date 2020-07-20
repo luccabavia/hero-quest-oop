@@ -52,5 +52,10 @@ public abstract class Weapon implements Item {
         return this.attack;
     }
 
+    public int performAttack() {
+        this.durability--;
+        return this.getAttack();
+    }
+
     public int getRange() { return this.range; }
 }
