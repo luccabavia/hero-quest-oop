@@ -7,7 +7,7 @@ import item.Item;
  */
 public abstract class Armor implements Item {
 
-    private String name;
+    protected String name;
     private int defense;
     private int durability;
 
@@ -17,7 +17,6 @@ public abstract class Armor implements Item {
      * @param name String
      * @param defense int
      * @param durability int
-
      */
     public Armor(String name, int defense, int durability) {
         this.name = name;
