@@ -3,13 +3,18 @@ package item.equipment.spell;
 import entity.character.Character;
 import java.util.Random;
 
-public class MagicMissile extends Spell {
+public class MagicMissile extends Spell implements AttackSpell {
 
 
     private final int MAX_TARGETS = 3;
 
     public MagicMissile() {
-        super(1, -2, "MagicMissile");
+        super(1, -2, "MagicMissile", 3);
+    }
+
+    @Override
+    public void castSpell(Character target) {
+        target.sufferEffect(MAX_TARGETS*lifeEffect);
     }
 
     @Override
@@ -17,11 +22,11 @@ public class MagicMissile extends Spell {
         int numberOfTargets = targets.length;
         switch (numberOfTargets) {
             case 1:
-                super.castSpell(targets[0]);
+                this.castSpell(targets[0]);
                 break;
             case 3:
                 for (int i = 0; i < MAX_TARGETS; i++) {
-                    super.castSpell(targets[i]);
+                    targets[i].sufferEffect(lifeEffect);
                 }
                 break;
             default:
@@ -30,11 +35,11 @@ public class MagicMissile extends Spell {
                 int secondTarget = 3 - firstTarget;
 
                 for (int i = 0; i < firstTarget; i++) {
-                    super.castSpell(targets[0]);
+                    targets[0].sufferEffect(lifeEffect);
                 }
 
                 for (int i = 0; i < secondTarget; i++) {
-                    super.castSpell(targets[1]);
+                    targets[1].sufferEffect(lifeEffect);
                 }
         }
     }

@@ -3,13 +3,13 @@ package item.equipment.spell;
 import dice.Dice;
 import entity.character.Character;
 
-public class SimpleHeal extends Spell {
+public class SimpleHeal extends Spell implements BuffingSpell {
 
     private final int NUMBER_OF_DICE = 1;
     private Dice dice;
 
     public SimpleHeal() {
-        super(1, 1, "SimpleHeal");
+        super(1, 1, "SimpleHeal", 0);
     }
 
     @Override
