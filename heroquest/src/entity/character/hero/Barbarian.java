@@ -8,7 +8,11 @@ public class Barbarian extends Hero {
     public Barbarian(Map map, int x, int y, String name) {
         super(map, x, y, "Bb", 8,3, 2,
                 2, 2, name);
-        this.weapon.add(new LongSword());
+        this.setStartingEquipment();
     }
 
+    @Override
+    protected void setStartingEquipment() {
+        this.setDualWieldingWeapon(new LongSword());
+    }
 }
