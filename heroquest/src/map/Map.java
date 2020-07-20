@@ -223,8 +223,8 @@ public class Map {
             for (int j = 0; j < this.map[0].length; j++) {
                 if (this.map[i][j][1] != null) {
                     try {
-                        Character Monster = (Monster) this.map[i][j][1];
-                        monsters.add((Monster) this.map[i][j][1]);
+                        Monster monster = (Monster) this.map[i][j][1];
+                        monsters.add(monster);
                     } catch (ClassCastException e) {
 //                        Display.print(String.format("No character found in " +
 //                                        "position (%d, %d).\n", i, j));
