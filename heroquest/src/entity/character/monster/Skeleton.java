@@ -8,21 +8,12 @@ public class Skeleton extends Monster {
     public Skeleton(Map map, int x, int y) {
         super(map, x, y, "Sk", 4, 2,2,
                 2);
-        this.weapon.add(new ShortSword());
-    }
-
-
-    @Override
-    public void attack() {}
-
-    @Override
-    public void defend() {
-
+        this.setStartingEquipment();
     }
 
     @Override
-    protected void castSpell() {
-
+    protected void setStartingEquipment() {
+        this.weapon = new ShortSword();
     }
 
 }
