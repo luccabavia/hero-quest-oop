@@ -60,10 +60,10 @@ public class Game {
     }
 
     private void heroRound() throws UnknownItemException {
-        //usePotion()
+        //usePotion();
         heroMovement();
-        // changeEquipment()
-        // heroAction()
+        changeHeroEquipment();
+        // heroAction();
         //drawBoard();
 
     }
@@ -190,6 +190,102 @@ public class Game {
                 steps++;
                 Display.print(e.getMessage());
             }
+        }
+    }
+
+    private void changeHeroEquipment() {
+        Display.print("Your current status is: ");
+        Display.print(this.hero.getStatus());
+        String changeEquipment = Keyboard.getInput("Would you like to " +
+                "change equipment? [y/n] ");
+
+        if (changeEquipment.equalsIgnoreCase("y")) {
+            boolean continueChangingEquipment = true;
+            do {
+                Display.print(this.hero.getItemsInBag());
+                int equipToChange = Integer.parseInt(
+                        Keyboard.getInput("Which" +
+                                "equipment would you like to change? " +
+                                "\n[0] Armor;\n[1] Weapon;\n[2] Spell;")
+                );
+                switch (equipToChange) {
+                    case 0:
+                        changeHeroArmor();
+                        break;
+                    case 1:
+                        changeHeroWeapon();
+                        break;
+                    case 2:
+                        changeHeroSpell();
+                        break;
+                    default:
+                        break;
+                }
+                if (Keyboard.getInput("Would you like to continue " +
+                        "changing your equipment? [y/n] ").equalsIgnoreCase(
+                                "n")) {
+                    continueChangingEquipment = false;
+                }
+            } while(continueChangingEquipment);
+
+
+
+        }
+    }
+
+    private void changeHeroArmor() {
+        int index = Integer.parseInt(Keyboard.getInput("Which armor would " +
+                "you like to equip? [index from bag]"));
+        try {
+            this.hero.setEquippedArmor(index);
+        } catch (InvalidItemException e) {
+            Display.printWarning(e.getMessage());
+        }
+    }
+
+    private void changeHeroWeapon() {
+        int index = Integer.parseInt(Keyboard.getInput("Which weapon would " +
+                "you like to equip? [index from bag]"));
+
+        OccupiedHand usedHand = null;
+        int handIndex;
+        boolean validSelection = false;
+        do {
+            handIndex = Integer.parseInt(Keyboard.getInput("In which hand " +
+                    "would you like to equipped the weapon? \n[0] Left \n[1] " +
+                    "Right \n[2] Both "));
+            switch (handIndex) {
+                case 0:
+                    usedHand = OccupiedHand.LEFT;
+                    validSelection = true;
+                    break;
+                case 1:
+                    usedHand = OccupiedHand.RIGHT;
+                    validSelection = true;
+                    break;
+                case 2:
+                    usedHand = OccupiedHand.BOTH;
+                    validSelection = true;
+                    break;
+                default:
+                    break;
+            }
+        } while (!validSelection);
+
+        try {
+            this.hero.setEquippedWeapon(index, usedHand);
+        } catch (InvalidItemException e) {
+            Display.print(e.getMessage());
+        }
+    }
+
+    private void changeHeroSpell() {
+        int index = Integer.parseInt(Keyboard.getInput("Which spell would " +
+                "you like to equip? [index from bag]"));
+        try {
+            this.hero.setEquippedSpell(index);
+        } catch (InvalidItemException e) {
+            Display.printWarning(e.getMessage());
         }
     }
 
