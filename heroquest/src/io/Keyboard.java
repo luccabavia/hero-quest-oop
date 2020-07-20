@@ -16,6 +16,11 @@ public class Keyboard {
         return scannerString.next();
     }
 
+    /**
+     *
+     * @param message
+     * @return
+     */
     public static String getInput(String message) {
         Display.print(message);
         Scanner scannerString = new Scanner(System.in);
