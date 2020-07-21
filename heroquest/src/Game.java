@@ -1,9 +1,11 @@
+import battle.Battle;
 import dice.Dice;
 import entity.Entity;
 import entity.character.Character;
 import entity.character.hero.*;
 import entity.character.monster.Monster;
 import entity.chest.Chest;
+import entity.trap.Trap;
 import io.Display;
 import io.Keyboard;
 import map.Map;
@@ -18,19 +20,19 @@ public class Game {
     private boolean exit;
     private Hero hero;
     private Map map;
+    private Battle battle;
 
     public Game() {
         try {
             configure();
-        } catch (PositionDoesNotExistException e) {
-            Display.print(e.getMessage());
-        } catch (CannotWalkOverException e) {
+        } catch (PositionDoesNotExistException | IsTrapException |
+                CannotWalkOverException e) {
             Display.print(e.getMessage());
         }
 
     }
 
-    public void startGameLoop() throws UnknownItemException {
+    public void startGameLoop() {
         exit = false;
         System.out.println("Game started!");
         StringBuilder finalMessage = new StringBuilder("Final message: ");
@@ -38,45 +40,48 @@ public class Game {
         int i = 0;
         while (!exit) {
             drawBoard();
-            if (this.hero.getHealth() > 0){
+            try {
                 heroRound();
-            } else {
-                finalMessage.append("You have died! You loose!!");
-                break;
-            }
-            if (this.map.hasMonsters()) {
                 monsterRound();
-            } else {
+                i++;
+                if (i > 20) {
+                    exit = true;
+                }
+            } catch (MonstersDiedException e) {
                 finalMessage.append("All monsters killed! You win!!");
                 break;
-            }
-            i++;
-            if (i > 20) {
-                exit = true;
+            } catch	(HeroDiedException e){
+                finalMessage.append("You have died! You loose!!");
             }
         }
         Display.print(finalMessage.toString());
         Display.print("Game terminated. Bye!");
     }
 
-    private void heroRound() throws UnknownItemException {
+    private void heroRound() throws HeroDiedException {
         //usePotion();
         heroMovement();
         changeHeroEquipment();
-        // heroAction();
+        heroAction();
         //drawBoard();
 
     }
 
-    private void monsterRound() {
-        //monsterAction()
-        monsterMovement();
-        drawBoard();
+    private void monsterRound() throws MonstersDiedException,
+            HeroDiedException {
+        if(this.map.hasMonsters()) {
+            monsterAttack();
+            monsterMovement();
+        }
+        else {
+            throw new MonstersDiedException();
+        }
     }
 
     // Decides whether the map is standard or random
     private void configure() throws
-            CannotWalkOverException, PositionDoesNotExistException {
+            CannotWalkOverException, PositionDoesNotExistException,
+            IsTrapException {
         this.map = Map.getInstance();//MapMode.DEFAULT);
         int[] startPosition = this.map.setGameMode(MapMode.DEFAULT);
         do {
@@ -85,6 +90,7 @@ public class Game {
         this.map.placeHero(this.hero);
         this.map.updateVisibility();
         this.map.viewAllMap();
+        this.battle = new Battle();
     }
 
     private Hero selectHero(int[] startPosition) {
@@ -132,14 +138,15 @@ public class Game {
     }
 
     private void drawBoard(){
-        //Display.print(hero.getStatus());
         this.map.drawMap();
+        Display.print(this.hero.getStatus());
 
     }
 
-    private void heroMovement() throws UnknownItemException {
+    private void heroMovement() throws HeroDiedException {
         String command;
         int steps = 0;
+        String action= new String();
         do {
 
             Display.print("Press r to roll the Dice");
@@ -155,7 +162,7 @@ public class Game {
                         "Use w, a, s, d keys to move, " +
                                 "collect items with i and exit with q."
                 );
-                String action = Keyboard.getInput();
+                action = Keyboard.getInput();
                 steps--;
                 switch (action) {
                     case "w":
@@ -170,6 +177,7 @@ public class Game {
                     case "a":
                         this.hero.moveWest();
                         break;
+                        // REMOVER E COLOCAR NO ACTION PHASE DO HEROI
                     case "i":
                         steps++;
                         this.collectItem();
@@ -183,14 +191,75 @@ public class Game {
                 }
                 this.map.updateVisibility();
                 this.map.drawMap();
-            } catch (PositionDoesNotExistException e){
+            } catch (PositionDoesNotExistException |
+                    CannotWalkOverException e) {
                 steps++;
                 Display.print(e.getMessage());
-            } catch (CannotWalkOverException e) {
-                steps++;
-                Display.print(e.getMessage());
+            } catch (IsTrapException e) {
+                int damage = 0;
+                int[] heroPosition = this.hero.getPosition();
+                Display.print(this.hero.getStatus());
+                try {
+                    switch (action) {
+                        case "w":
+                            damage = this.map.trapEffect(heroPosition[0] - 1,
+                                    heroPosition[1]);
+                            this.hero.moveNorth();
+                            break;
+                        case "s":
+                            damage = this.map.trapEffect(heroPosition[0] + 1,
+                                    heroPosition[1]);
+                            this.hero.moveSouth();
+                            break;
+                        case "d":
+                            damage = this.map.trapEffect(heroPosition[0],
+                                    heroPosition[1] + 1);
+                            this.hero.moveEast();
+                            break;
+                        case "a":
+                            damage = this.map.trapEffect(heroPosition[0],
+                                    heroPosition[1] - 1);
+                            this.hero.moveWest();
+                            break;
+                    }
+                    System.out.printf("GOTCHA!! You Suffer %d " +
+                            "Damage from a Trap\n", damage);
+                    Display.print(this.hero.getStatus());
+                    this.map.updateVisibility();
+                    this.map.drawMap();
+                } catch (PositionDoesNotExistException |
+                        CannotWalkOverException | IsTrapException e1){
+                    steps++;
+                }
+            }
+            if (this.hero.getHealth() <= 0) {
+                throw new HeroDiedException();
             }
         }
+    }
+
+    private void collectItem() {
+
+        Chest chest = this.hero.searchForItems();
+        String input;
+        if (chest != null) {
+            while (chest.getSize() > 0) {
+                chest.displayItems();
+                input = Keyboard.getInput("Which items will you " +
+                        "collect? Press q to stop collection... ");
+                if (input.equalsIgnoreCase("q")) {break;}
+                if (Integer.parseInt(input) < chest.getSize()) {
+                    this.hero.addItemToBag(
+                            chest.collectItems(Integer.parseInt(input))
+                    );
+                }
+            }
+            if (chest.getSize() == 0) {
+                int[] pos = chest.getPosition();
+                this.map.updateMap(pos[0], pos[1]);
+            }
+        }
+        Display.print(this.hero.getStatus());
     }
 
     private void changeHeroEquipment() {
@@ -289,28 +358,91 @@ public class Game {
         }
     }
 
-    private void collectItem() throws UnknownItemException {
+    private void heroAction() {
 
-        Chest chest = this.hero.searchForItems();
-        String input;
-        if (chest != null) {
-            while (chest.getSize() > 0) {
-                chest.displayItems();
-                input = Keyboard.getInput("Which items will you " +
-                        "collect? Press q to stop collection... ");
-                if (input.equalsIgnoreCase("q")) {break;}
-                if (Integer.parseInt(input) < chest.getSize()) {
-                    this.hero.addItemToBag(
-                            chest.collectItems(Integer.parseInt(input))
-                    );
-                }
-            }
-            if (chest.getSize() == 0) {
-                int[] pos = chest.getPosition();
-                this.map.updateMap(pos[0], pos[1]);
+        String mode = Keyboard.getInput("Select action type: p - physical " +
+                "attack, s - spell casting, c - search for treasure");
+        if (mode.equalsIgnoreCase("p")) {
+            this.heroAttack();
+        } else if (mode.equalsIgnoreCase("s")) {
+            // FUNÇÃO PARA USAR SPELL
+        } else if (mode.equalsIgnoreCase("c")) {
+            this.collectItem();
+        }
+
+
+    }
+
+    private void heroAttack() {
+        try {
+            Monster monster = selectTarget();
+            battle.physicalCombat(this.hero, monster);
+        } catch (NoAvailableMonstersToAttackException e) {
+            Display.printWarning(e.getMessage());
+        }
+
+    }
+
+    private void monsterAttack() throws HeroDiedException {
+
+        ArrayList<Monster> monsters = this.map.getAttackersMonsters();
+        int counter = 0;
+        int[] monsterPosition;
+//        Display.print("------------------Monsters Attackers ----------------");
+        for (Monster m : monsters) {
+            monsterPosition = m.getPosition();
+//            System.out.printf("Monster (%d) Position: x:%d, y:%d\n", counter,
+//                    monsterPosition[0], monsterPosition[1]);
+            battle.physicalCombat(m, this.hero);
+//            Keyboard.getInput("Digite para continuar");
+            counter++;
+        }
+
+        if (this.hero.getHealth() <= 0) {throw new HeroDiedException();}
+
+    }
+
+    private int getHeroRangeToAttack() {
+        return hero.getEquippedWeaponRange();
+    }
+
+    private Monster selectTarget() throws
+            NoAvailableMonstersToAttackException {
+
+        int range = getHeroRangeToAttack();
+        ArrayList<Monster> monsters = this.map.getMonstersToAttack(range);
+        if (monsters.size() == 0) {
+            throw new NoAvailableMonstersToAttackException("No monsters in " +
+                    "range to attack");
+        }
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i < monsters.size(); i++) {
+            if (i != monsters.size() - 1) {
+                s.append(String.format("[%d] %s ", i,
+                        monsters.get(i).getStatus()));
+            } else {
+                s.append(String.format("[%d] %s, ", i,
+                        monsters.get(i).getStatus()));
             }
         }
-        Display.print(this.hero.getStatus());
+
+        Display.print(s.toString());
+        boolean validSelection = false;
+        int index = -1;
+        do {
+            try {
+                index = Keyboard.getIntInput("Select monster to attack " +
+                        "via list index: ");
+                if (index >= 0) {
+                    validSelection = true;
+                }
+            } catch (Exception e) {
+                Display.printWarning("Not a valid list index, " +
+                        "please input a positive integer");
+            }
+        } while (!validSelection);
+
+        return monsters.get(index);
     }
 
     private void monsterMovement() {
