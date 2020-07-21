@@ -1,12 +1,6 @@
 package bag;
 
-import exceptions.UnknownItemException;
-import io.Display;
 import item.Item;
-import item.treasure.Treasure;
-import item.equipment.armor.Armor;
-import item.equipment.spell.Spell;
-import item.equipment.weapon.Weapon;
 
 import java.util.ArrayList;
 
