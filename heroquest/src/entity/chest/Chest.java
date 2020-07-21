@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Chest extends Entity {
 
     private ArrayList<Item> items = new ArrayList<>();
+    private boolean hasMonster;
 
     public Chest(int x, int y) {
         this.x = x;
