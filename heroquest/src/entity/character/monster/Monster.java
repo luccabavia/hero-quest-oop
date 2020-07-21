@@ -1,5 +1,6 @@
 package entity.character.monster;
 
+import dice.CombatDiceType;
 import exceptions.*;
 import io.Display;
 import item.equipment.spell.Spell;
@@ -18,7 +19,8 @@ public abstract class Monster extends Character {
     Monster(Map map, int x, int y, String sprite, int bodyPoints,
             int attackDice, int defenseDice, int maxSteps) {
         super(map, x, y, String.format("\u001b[35m%s\u001b[0m",sprite),
-                bodyPoints, attackDice, defenseDice);
+                bodyPoints, attackDice, defenseDice,
+                CombatDiceType.BLACK_SHIELD);
         this.maxSteps = maxSteps;
     }
 
@@ -60,7 +62,7 @@ public abstract class Monster extends Character {
                         this.moveWest();
                         break;
                 }
-                this.map.drawMap();
+//                this.map.drawMap();
             } catch (PositionDoesNotExistException e){
 //                Display.printWarning(e.getMessage());
                 steps++;
