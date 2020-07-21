@@ -1,49 +1,45 @@
 package battle;
 
+import dice.CombatDiceType;
 import entity.character.Character;
-import dice.*;
+import dice.Dice;
 import io.Keyboard;
+import map.Map;
 
 /**
- * Define combat interaction between two chacracter
+ * Define combat interaction between two characters
  */
 public class Battle {
 
     private static Battle instance;
     private Character charA;
     private Character charB;
+    //private Map map;
 
-    private Battle() {
+    public Battle(){}//Map map) {
+       //this.map = map;
+    //}
 
-    }
+//    public static Battle getInstance() {
+//        if (instance == null) {
+//            instance = new Battle();
+//        }
+//        return instance;
+//    }
 
-    public static Battle getInstance() {
-        if (instance == null) {
-            instance = new Battle();
-        }
-        return instance;
-    }
+    public void physicalCombat(Character attacker, Character defender) {
 
-    public void Combat(Character attacker, Character defender) {
+        int atk = Dice.rollCombatDice(
+                attacker.getAttack(),
+                CombatDiceType.SKULL
+        );
 
-        // decidir se vai atacar fisicamente ou spell
+        int def = Dice.rollCombatDice(
+                defender.getDefense(),
+                defender.getDefenseType()
+        );
 
-        //Keyboard.getInput();
-
-    }
-
-    private void PhysicalCombat(Character attacker, Character defender) {
-
-//        int atk = Dice.rollCombatDice(
-//                attacker.getAttackDice(),
-//                DiceCombatType.SKULL
-//        );
-//        int def = Dice.rollCombatDice(
-//                defender.getDefenseDice(),
-//                defender.getDefDiceType()
-//        );
-//
-//        defender.sufferEffect(Math.max(0, (atk - def)));
+        defender.sufferEffect(Math.min(0, -(atk - def)));
 
     }
 
