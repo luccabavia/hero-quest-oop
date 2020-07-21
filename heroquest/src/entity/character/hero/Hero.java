@@ -1,6 +1,7 @@
 package entity.character.hero;
 
 import bag.Bag;
+import dice.CombatDiceType;
 import entity.character.SpellCaster;
 import entity.chest.Chest;
 import exceptions.*;
@@ -48,7 +49,7 @@ public abstract class Hero extends Character implements SpellCaster {
                 int attackDice, int defenseDice, int movementDice,
                 int mindPoints, String name) {
         super(map, x, y, sprite, bodyPoints, attackDice,
-                defenseDice);
+                defenseDice, CombatDiceType.WHITE_SHIELD);
         this.name = name;
         this.mindPoints = mindPoints;
         this.movementDice = movementDice;
@@ -192,6 +193,8 @@ public abstract class Hero extends Character implements SpellCaster {
         int weaponRange;
         if (this.usedHand == OccupiedHand.LEFT) {
             weaponRange = this.leftHandWeapon.getRange();
+        } else if (this.usedHand == OccupiedHand.BOTH) {
+            weaponRange = this.dualWieldingWeapon.getRange();
         } else {
             weaponRange = this.rightHandWeapon.getRange();
         }
@@ -295,9 +298,10 @@ public abstract class Hero extends Character implements SpellCaster {
      * @param newWeapon weapon in bag that will be equipped
      */
     protected void setLeftHandWeapon(Weapon newWeapon) {
-            this.storeDualWieldingWeapon();
-            this.storeLeftHandWeapon();
-            this.leftHandWeapon = newWeapon;
+        this.storeDualWieldingWeapon();
+        this.storeLeftHandWeapon();
+        this.leftHandWeapon = newWeapon;
+        this.usedHand = OccupiedHand.LEFT;
     }
 
     /**
@@ -309,6 +313,8 @@ public abstract class Hero extends Character implements SpellCaster {
         this.storeDualWieldingWeapon();
         this.storeRightHandWeapon();
         this.rightHandWeapon = newWeapon;
+        this.usedHand = OccupiedHand.RIGHT;
+
 
     }
 
@@ -322,6 +328,7 @@ public abstract class Hero extends Character implements SpellCaster {
             this.storeRightHandWeapon();
             this.storeDualWieldingWeapon();
             this.dualWieldingWeapon = newWeapon;
+            this.usedHand = OccupiedHand.BOTH;
 
     }
 
