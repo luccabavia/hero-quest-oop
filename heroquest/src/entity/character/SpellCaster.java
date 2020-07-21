@@ -13,4 +13,6 @@ public interface SpellCaster {
      */
     void castSpell();
 
+    //void setSpellCastParameters();
+
 }
