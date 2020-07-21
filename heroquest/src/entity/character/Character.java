@@ -1,5 +1,6 @@
 package entity.character;
 
+import dice.CombatDiceType;
 import entity.Entity;
 import item.equipment.spell.Spell;
 import item.equipment.weapon.Weapon;
@@ -17,6 +18,7 @@ public abstract class Character extends Entity implements WeaponUser {
     protected int attackDice;
     protected int defenseDice;
     protected int bodyPoints;
+    protected CombatDiceType defenseType;
 
     /**
      * Constructor method for character parent class.
@@ -27,7 +29,8 @@ public abstract class Character extends Entity implements WeaponUser {
      * @param sprite String
      */
     public Character(Map map, int x, int y, String sprite, int bodyPoints,
-                     int attackDice, int defenseDice) {
+                     int attackDice, int defenseDice,
+                     CombatDiceType defenseType) {
         this.map = map;
         this.x = x;
         this.y = y;
@@ -35,12 +38,14 @@ public abstract class Character extends Entity implements WeaponUser {
         this.bodyPoints = bodyPoints;
         this.attackDice = attackDice;
         this.defenseDice = defenseDice;
+        this.defenseType = defenseType;
     }
 
     protected abstract void setStartingEquipment();
 
     public void moveNorth() throws
-            PositionDoesNotExistException, CannotWalkOverException {
+            PositionDoesNotExistException, CannotWalkOverException,
+            IsTrapException {
         try {
             if(this.map.isAvailable(x - 1, y)) {
                 int oldX = this.x;
@@ -50,15 +55,15 @@ public abstract class Character extends Entity implements WeaponUser {
                 //                    this.x, this.y);
                 this.map.updateMap(oldX, this.y);
             }
-        } catch (PositionDoesNotExistException e){
-            throw e;
-        } catch (CannotWalkOverException e) {
+        } catch (PositionDoesNotExistException | CannotWalkOverException |
+                IsTrapException e){
             throw e;
         }
     }
 
     public void moveSouth() throws
-            PositionDoesNotExistException, CannotWalkOverException {
+            PositionDoesNotExistException, CannotWalkOverException,
+            IsTrapException {
         try {
             if(this.map.isAvailable(x + 1, y)) {
                 int oldX = this.x;
@@ -68,15 +73,15 @@ public abstract class Character extends Entity implements WeaponUser {
                 //                        this.x, this.y);
                 this.map.updateMap(oldX, this.y);
             }
-        } catch (PositionDoesNotExistException e){
-            throw e;
-        } catch (CannotWalkOverException e) {
+        } catch (PositionDoesNotExistException | CannotWalkOverException |
+                IsTrapException e) {
             throw e;
         }
     }
 
     public void moveEast() throws
-            PositionDoesNotExistException, CannotWalkOverException {
+            PositionDoesNotExistException, CannotWalkOverException,
+            IsTrapException {
         try {
             if(this.map.isAvailable(x, y + 1)) {
                 int oldY = this.y;
@@ -86,16 +91,16 @@ public abstract class Character extends Entity implements WeaponUser {
                 //        this.x, this.y);
                 this.map.updateMap(this.x, oldY);
             }
-        } catch (PositionDoesNotExistException e){
-            throw e;
-        } catch (CannotWalkOverException e) {
+        } catch (PositionDoesNotExistException | CannotWalkOverException |
+                IsTrapException e) {
             throw e;
         }
 
     }
 
     public void moveWest() throws
-            PositionDoesNotExistException, CannotWalkOverException {
+            PositionDoesNotExistException, CannotWalkOverException,
+            IsTrapException {
         try {
             if(this.map.isAvailable(x, y - 1)){
                 int oldY = this.y;
@@ -105,9 +110,8 @@ public abstract class Character extends Entity implements WeaponUser {
                 //                    this.x, this.y);
                 this.map.updateMap(this.x, oldY);
             }
-        } catch (PositionDoesNotExistException e){
-            throw e;
-        } catch (CannotWalkOverException e) {
+        } catch (PositionDoesNotExistException | CannotWalkOverException |
+                IsTrapException e){
             throw e;
         }
     }
@@ -115,6 +119,10 @@ public abstract class Character extends Entity implements WeaponUser {
     public abstract int getAttack();
 
     public abstract int getDefense();
+
+    public CombatDiceType getDefenseType() {
+        return this.defenseType;
+    }
 
     /**
      * Inflict effect into character's body points.
