@@ -3,8 +3,12 @@ import dice.Dice;
 import entity.Entity;
 import entity.character.Character;
 import entity.character.hero.*;
+import entity.character.monster.Goblin;
 import entity.character.monster.Monster;
+import entity.character.monster.Skeleton;
+import entity.character.monster.SkeletonMage;
 import entity.chest.Chest;
+import entity.chest.NormalChest;
 import entity.trap.Trap;
 import io.Display;
 import io.Keyboard;
@@ -43,22 +47,20 @@ public class Game {
             try {
                 heroRound();
                 monsterRound();
-                i++;
-                if (i > 20) {
-                    exit = true;
-                }
             } catch (MonstersDiedException e) {
                 finalMessage.append("All monsters killed! You win!!");
                 break;
             } catch	(HeroDiedException e){
                 finalMessage.append("You have died! You loose!!");
+                break;
+
             }
         }
         Display.print(finalMessage.toString());
         Display.print("Game terminated. Bye!");
     }
 
-    private void heroRound() throws HeroDiedException {
+    private void heroRound() throws HeroDiedException, MonstersDiedException {
         //usePotion();
         heroMovement();
         changeHeroEquipment();
@@ -69,6 +71,7 @@ public class Game {
 
     private void monsterRound() throws MonstersDiedException,
             HeroDiedException {
+
         if(this.map.hasMonsters()) {
             monsterAttack();
             monsterMovement();
@@ -83,7 +86,7 @@ public class Game {
             CannotWalkOverException, PositionDoesNotExistException,
             IsTrapException {
         this.map = Map.getInstance();//MapMode.DEFAULT);
-        int[] startPosition = this.map.setGameMode(MapMode.DEFAULT);
+        int[] startPosition = this.map.setGameMode(MapMode.RANDOM);
         do {
             this.hero = selectHero(startPosition);
         } while (this.hero == null);
@@ -177,7 +180,6 @@ public class Game {
                     case "a":
                         this.hero.moveWest();
                         break;
-                        // REMOVER E COLOCAR NO ACTION PHASE DO HEROI
                     case "i":
                         steps++;
                         this.collectItem();
@@ -242,24 +244,55 @@ public class Game {
 
         Chest chest = this.hero.searchForItems();
         String input;
-        if (chest != null) {
-            while (chest.getSize() > 0) {
-                chest.displayItems();
-                input = Keyboard.getInput("Which items will you " +
-                        "collect? Press q to stop collection... ");
-                if (input.equalsIgnoreCase("q")) {break;}
-                if (Integer.parseInt(input) < chest.getSize()) {
-                    this.hero.addItemToBag(
-                            chest.collectItems(Integer.parseInt(input))
-                    );
+        try {
+            if (chest != null && chest.hasContents()) {
+                NormalChest container = (NormalChest) chest;
+                while (chest.hasContents()) {
+                    container.displayContents();
+                    input = Keyboard.getInput("Which items will you " +
+                            "collect? Press q to stop collection... ");
+                    if (input.equalsIgnoreCase("q")) {
+                        break;
+                    }
+                    if (Integer.parseInt(input) < container.getSize()) {
+                        this.hero.addItemToBag(
+                                container.collectItems(Integer.parseInt(input))
+                        );
+                    }
+                }
+                if (container.getSize() == 0) {
+                    int[] pos = chest.getPosition();
+                    this.map.updateMap(pos[0], pos[1]);
                 }
             }
-            if (chest.getSize() == 0) {
-                int[] pos = chest.getPosition();
-                this.map.updateMap(pos[0], pos[1]);
+            Display.print(this.hero.getStatus());
+        } catch (MonsterHiddenInChestException e) {
+            int[] position = chest.getPosition();
+            Monster monster;
+            Display.printWarning(e.getMessage());
+            switch (e.getMonsterType()) {
+                case GOBLIN:
+                    monster = new Goblin(this.map, position[0], position[1]);
+                    break;
+                case SKELETON_MAGE:
+                    monster = new SkeletonMage(this.map, position[0],
+                            position[1]);
+                    break;
+                default:
+                    monster = new Skeleton(this.map, position[0],
+                            position[1]);
+                    break;
             }
+            try {
+                this.map.removeEntity(monster);
+                this.map.setEntity(monster);
+            } catch (PositionDoesNotExistException
+                    | IsTrapException
+                    | CannotWalkOverException monsterE) {
+                monsterE.printStackTrace();
+            }
+
         }
-        Display.print(this.hero.getStatus());
     }
 
     private void changeHeroEquipment() {
@@ -358,7 +391,7 @@ public class Game {
         }
     }
 
-    private void heroAction() {
+    private void heroAction() throws MonstersDiedException {
 
         String mode = Keyboard.getInput("Select action type: p - physical " +
                 "attack, s - spell casting, c - search for treasure");
@@ -366,8 +399,10 @@ public class Game {
             this.heroAttack();
         } else if (mode.equalsIgnoreCase("s")) {
             // FUNÇÃO PARA USAR SPELL
-        } else if (mode.equalsIgnoreCase("c")) {
-            this.collectItem();
+        }
+
+        if (!this.map.hasMonsters()) {
+            throw new MonstersDiedException();
         }
 
 
@@ -397,7 +432,6 @@ public class Game {
 //            Keyboard.getInput("Digite para continuar");
             counter++;
         }
-
         if (this.hero.getHealth() <= 0) {throw new HeroDiedException();}
 
     }
