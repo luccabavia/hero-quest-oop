@@ -80,13 +80,8 @@ public abstract class Hero extends Character implements SpellCaster {
             } catch (PositionDoesNotExistException e) {
                 continue;
             }
-//            if (map.hasChest(i[0], i[1])) {
-//                this.collectItem(i[0], i[1]);
-//                break;
-//            }
         }
         return null;
-//        throw new NoChestFoundException("No chests locate around hero");
     }
 
     public void addItemToBag(Item item) {
@@ -130,6 +125,16 @@ public abstract class Hero extends Character implements SpellCaster {
                 this.mindPoints, weapon, spell, armor,
                 this.bag.getStatus());
         return s;
+    }
+
+    public String getStatus(boolean summarized) {
+        if (summarized) {
+            String s = String.format("Name: %s, %s",
+                    this.name, super.getStatus(true));
+            return s;
+        } else {
+            return this.getStatus();
+        }
     }
 
     /**
