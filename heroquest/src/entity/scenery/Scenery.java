@@ -15,6 +15,7 @@ public abstract class Scenery extends Entity {
         this.y = y;
         this.sprite = sprite;
         this.walkOver = walkOver;
+        this.hidden = false;
     }
 
     public boolean canWalkOver() {
