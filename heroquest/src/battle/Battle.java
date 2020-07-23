@@ -3,6 +3,7 @@ package battle;
 import dice.CombatDiceType;
 import entity.character.Character;
 import dice.Dice;
+import io.Display;
 import io.Keyboard;
 import map.Map;
 
@@ -40,7 +41,18 @@ public class Battle {
         );
 
         defender.sufferEffect(Math.min(0, -(atk - def)));
+        this.afterActionReport(attacker, defender);
 
+    }
+
+    private void afterActionReport(Character attacker, Character defender) {
+        String report = String.format(
+                "\nAttacker: {%s}\n" +
+                        "Defender: {%s}",
+                attacker.getStatus(true),
+                defender.getStatus(true)
+        );
+        Display.print(report);
     }
 
 
