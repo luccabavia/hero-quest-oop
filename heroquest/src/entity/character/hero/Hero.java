@@ -127,6 +127,7 @@ public abstract class Hero extends Character implements SpellCaster {
         return s;
     }
 
+    @Override
     public String getStatus(boolean summarized) {
         if (summarized) {
             String s = String.format("Name: %s, %s",
