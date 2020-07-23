@@ -10,6 +10,7 @@ public class Trap extends Entity{
         this.x = x;
         this.y = y;
         this.damage = damage;
+        this.hidden = true;
     }
 
     public int getDamage() {

@@ -12,6 +12,7 @@ public abstract class Entity {
     protected String sprite;
     protected int x;
     protected int y;
+    protected boolean hidden;
 
     /**
      * Get the representation of entity.
@@ -23,5 +24,7 @@ public abstract class Entity {
     }
 
     public int[] getPosition() { return new int[] {x, y}; }
+
+    public boolean isHidden() { return this.hidden; }
 
 }
