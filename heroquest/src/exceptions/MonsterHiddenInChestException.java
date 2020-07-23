@@ -5,6 +5,7 @@ import entity.character.monster.MonsterType;
 public class MonsterHiddenInChestException extends Exception {
 
     private MonsterType monsterType;
+    private int[] monsterPosition;
 
     public MonsterHiddenInChestException() {
         super();
@@ -22,13 +23,20 @@ public class MonsterHiddenInChestException extends Exception {
         super(message, cause);
     }
 
-    public MonsterHiddenInChestException(String message, MonsterType monsterType) {
+    public MonsterHiddenInChestException(String message,
+                                         MonsterType monsterType,
+                                         int[] monsterPosition) {
         super(message);
         this.monsterType = monsterType;
+        this.monsterPosition = monsterPosition;
     }
 
     public MonsterType getMonsterType() {
         return this.monsterType;
+    }
+
+    public int[] getMonsterPosition() {
+        return this.monsterPosition;
     }
 
 }

@@ -37,7 +37,8 @@ public class TrapChest extends Chest {
         );
         throw new MonsterHiddenInChestException(
                 message,
-                monsterType
+                monsterType,
+                new int[] {this.x, this.y}
         );
     }
 

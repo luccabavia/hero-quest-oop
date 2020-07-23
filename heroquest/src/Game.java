@@ -267,7 +267,7 @@ public class Game {
             }
             Display.print(this.hero.getStatus());
         } catch (MonsterHiddenInChestException e) {
-            int[] position = chest.getPosition();
+            int[] position = e.getMonsterPosition();
             Monster monster;
             Display.printWarning(e.getMessage());
             switch (e.getMonsterType()) {
