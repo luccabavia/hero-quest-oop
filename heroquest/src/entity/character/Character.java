@@ -39,6 +39,7 @@ public abstract class Character extends Entity implements WeaponUser {
         this.attackDice = attackDice;
         this.defenseDice = defenseDice;
         this.defenseType = defenseType;
+        this.hidden = false;
     }
 
     protected abstract void setStartingEquipment();
@@ -131,6 +132,9 @@ public abstract class Character extends Entity implements WeaponUser {
      */
     public void sufferEffect(int value) {
         this.bodyPoints += value;
+        if (this.bodyPoints <= 0) {
+            this.map.removeEntity(this);
+        }
     }
 
     /**
@@ -153,6 +157,17 @@ public abstract class Character extends Entity implements WeaponUser {
                 this.sprite, this.x, this.y, this.bodyPoints, this.attackDice,
                 this.defenseDice);
         return s;
+    }
+
+    public String getStatus(boolean summarized) {
+        if (summarized) {
+            String s = String.format(
+                    "Sprite: %s, Positon: (%d, %d), Body points: %d",
+                    this.sprite, this.x, this.y, this.bodyPoints);
+            return s;
+        } else {
+            return this.getSprite();
+        }
     }
 
 }
