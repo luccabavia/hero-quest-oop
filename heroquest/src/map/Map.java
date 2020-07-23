@@ -5,11 +5,16 @@ import entity.character.Character;
 import entity.character.hero.Hero;
 import entity.character.monster.Goblin;
 import entity.character.monster.Monster;
+import entity.character.monster.MonsterType;
 import entity.character.monster.Skeleton;
 import entity.chest.Chest;
+import entity.chest.NormalChest;
+import entity.chest.TrapChest;
 import entity.scenery.*;
 import entity.trap.*;
 import exceptions.*;
+import generator.MonsterGenerator;
+import generator.RandomMonsterGenerator;
 import io.Display;
 import io.ImportFromFile;
 import item.Item;
@@ -44,6 +49,13 @@ public class Map {
         visibility = new boolean[map.length][map[0].length];
     }
 
+    public int[] getMapSize() {
+        return new int[] {
+                this.map.length,
+                this.map[0].length
+        };
+    }
+
     public int[] setGameMode(MapMode mapMode) {
 
         int[] startPosition = new int[] {0, 0};
@@ -54,7 +66,8 @@ public class Map {
                 break;
             default:
                 // mapa padrao
-                this.createStandardMap();
+//                this.createStandardMap();
+                this.generateStandardMap();
                 break;
         }
         return startPosition;
@@ -75,8 +88,6 @@ public class Map {
                     return (Chest) this.map[x][y][1];
                 } catch (ClassCastException e) {
                     return null;
-//                    throw new NoChestFoundException(
-//                            String.format("No chest at (%d, %d)", x, y));
                 }
             }
             return null;
@@ -89,7 +100,7 @@ public class Map {
             for (int j = 0; j < map[0].length; j++) {
                 if(visibility[i][j]) {
                     if (map[i][j][1] != null) {
-                        if (!map[i][j][1].getSprite().contains("Trap")) {
+                        if (!map[i][j][1].isHidden()) {
                             s.append(map[i][j][1].getSprite());
                         } else {
                             s.append(map[i][j][0].getSprite());
@@ -207,13 +218,22 @@ public class Map {
                 {0, 8}
         };
 
+        int[][] trapChestPosition = new int[][] {
+                {5, 0}
+        };
+
         Item longSword = new LongSword();
         Item shortSword = new ShortSword();
 
         for (int[] pos: chestPosition) {
-            Chest chest = new Chest(pos[0], pos[1]);
+            NormalChest chest = new NormalChest(pos[0], pos[1]);
             chest.addItem(longSword);
             chest.addItem(shortSword);
+            this.map[pos[0]][pos[1]][1] = chest;
+        }
+
+        for (int[] pos: trapChestPosition) {
+            TrapChest chest = new TrapChest(pos[0], pos[1], true);
             this.map[pos[0]][pos[1]][1] = chest;
         }
 
@@ -227,7 +247,64 @@ public class Map {
 
     }
 
+    private void generateStandardMap() {
+
+        MonsterType[] monsterTypes = new MonsterType[] {
+                MonsterType.SKELETON,
+                MonsterType.SKELETON,
+                MonsterType.SKELETON,
+                MonsterType.SKELETON,
+                MonsterType.GOBLIN
+        };
+
+        int[][] monstersPositions = new int[][] {
+                {12, 18},
+                {1, 1},
+                {3, 3},
+                {2, 4},
+                {15, 16}
+        };
+
+        MonsterGenerator monsterGenerator = new MonsterGenerator(this);
+        try {
+            ArrayList<Entity> monsters = monsterGenerator.generateMultipleEntities(
+                    monsterTypes,
+                    monstersPositions
+            );
+
+            for (Entity entity:monsters) {
+                this.setEntity(entity);
+            }
+        } catch (InvalidGeneratorSeedException e) {
+            e.printStackTrace();
+        } catch (PositionDoesNotExistException e) {
+            e.printStackTrace();
+        } catch (IsTrapException e) {
+            e.printStackTrace();
+        } catch (CannotWalkOverException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private void createRandomMap() {
+
+        RandomMonsterGenerator randomMonsters =
+                new RandomMonsterGenerator(this, MonsterType.values());
+        ArrayList<Entity> monsters =
+                randomMonsters.generateMultipleRandomEntities(10);
+
+        for (Entity entity:monsters) {
+            try {
+                this.setEntity(entity);
+            } catch (PositionDoesNotExistException e) {
+                e.printStackTrace();
+            } catch (CannotWalkOverException e) {
+                e.printStackTrace();
+            } catch (IsTrapException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -345,6 +422,11 @@ public class Map {
         } catch (CannotWalkOverException e) {
             throw e;
         }
+    }
+
+    public void removeEntity(Entity entity) {
+        int pos[] = entity.getPosition();
+        this.map[pos[0]][pos[1]][1] = null;
     }
 
     public boolean hasMonsters() {
