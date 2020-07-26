@@ -5,17 +5,14 @@ import entity.Entity;
 /**
  * Parent class for every object that can be a structure in the game's map.
  */
-
 public abstract class Scenery extends Entity {
 
-    private boolean walkOver;
+    private final boolean walkOver;
 
-    public Scenery(int x, int y, String sprite, boolean walkOver) {
-        this.x = x;
-        this.y = y;
-        this.sprite = sprite;
+    protected Scenery(int x, int y, String sprite, boolean walkOver,
+                      boolean seeThrough) {
+        super(x, y, sprite, false, seeThrough);
         this.walkOver = walkOver;
-        this.hidden = false;
     }
 
     public boolean canWalkOver() {
