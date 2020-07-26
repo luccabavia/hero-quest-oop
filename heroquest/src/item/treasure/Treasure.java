@@ -1,8 +1,8 @@
 package item.treasure;
 
-import item.Item;
+import item.Collectible;
 
-public abstract class Treasure implements Item {
+public abstract class Treasure implements Collectible {
 
     private int value;
     private String name;
@@ -14,10 +14,6 @@ public abstract class Treasure implements Item {
 
     public int getValue() {
         return this.value;
-    }
-
-    public Item collect() {
-        return this;
     }
 
     public String getCharacteristics() {

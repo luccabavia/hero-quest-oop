@@ -1,8 +1,8 @@
 package item.equipment.potion;
 
-import item.Item;
+import item.Collectible;
 
-public abstract class Potion implements Item {
+public abstract class Potion implements Collectible {
 
     private int lifeEffect;
     private String name;
@@ -12,9 +12,8 @@ public abstract class Potion implements Item {
         this.name = name;
     }
 
-    @Override
-    public Item collect() {
-        return this;
+    public int usePotion() {
+        return this.lifeEffect;
     }
 
     @Override
