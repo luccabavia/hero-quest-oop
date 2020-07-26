@@ -3,14 +3,12 @@ package entity.trap;
 import entity.Entity;
 
 public class Trap extends Entity{
+
     private int damage;
 
-    public Trap(String sprite, int x, int y, int damage) {
-        this.sprite = "Trap";
-        this.x = x;
-        this.y = y;
+    public Trap(int x, int y, int damage) {
+        super(x, y, "||", true, true);
         this.damage = damage;
-        this.hidden = true;
     }
 
     public int getDamage() {
