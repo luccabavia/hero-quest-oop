@@ -1,31 +1,53 @@
 package bag;
 
-import item.Item;
+import item.Collectible;
+import item.equipment.potion.Potion;
+import item.treasure.Treasure;
 
 import java.util.ArrayList;
 
 public class Bag {
+	private int value = 0;
     
     /**
     * Class for objects which a hero can store.
     */
-    private ArrayList<Item> items;
+    private ArrayList<Collectible> items;
 
      /**
      * Constructor method for bag class.
      */
     public Bag() {
-
         this.items = new ArrayList<>();
     }
 
-    public void addItem(Item item) {
-
+    public void addItem(Collectible item) {
+    	try {
+    		Treasure t = (Treasure) item;
+    		this.value += t.getValue();
+    	}catch (ClassCastException e ) {	
+    	}
         this.items.add(item);
     }
+    
+    public boolean hasPotion() {
+    	for(int i = 0; i < this.items.size(); i++) {
+    		try {
+    			Potion p = (Potion) this.items.get(i);
+    			return true;
+    		}catch (ClassCastException e ) {	
+        	}
+    	}
+    	return false;
+    }
+    
+    
+    public Collectible getItem(int itemIndex) {
+        return this.items.get(itemIndex);
+    }
 
-    public Item getItem(int itemIndex) {
-        return this.items.remove(itemIndex);
+    public void removeItem(int itemIndex) {
+        this.items.remove(itemIndex);
     }
 
     public String displayItems() {
@@ -39,6 +61,10 @@ public class Bag {
     }
 
     public String getStatus() {
-        return String.format("%d items in bag", this.items.size());
+        return String.format("Total value: %d, %d items in bag", this.value, this.items.size());
+    }
+
+    public int getSize() {
+        return this.items.size();
     }
 }
