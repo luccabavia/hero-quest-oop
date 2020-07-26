@@ -43,9 +43,13 @@ public class Dice {
         for (int i = 0; i < nDices; i++) {
 
             int number = random.nextInt(6) + 1;
-            if (number == 1 || number == 3 || number == 5) skull++;
-            else if (number == 2 || number == 4) whiteShield++;
-            else blackShield++;
+            if (number == 1 || number == 3 || number == 5) {
+                skull++;
+            } else if (number == 2 || number == 4) {
+                whiteShield++;
+            } else {
+                blackShield++;
+            }
         }
 
         switch (action) {
