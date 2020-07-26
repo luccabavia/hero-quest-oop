@@ -2,13 +2,8 @@ package entity.character;
 
 import dice.CombatDiceType;
 import entity.Entity;
-import item.equipment.spell.Spell;
-import item.equipment.weapon.Weapon;
 import exceptions.*;
 import map.Map;
-
-import java.util.ArrayList;
-
 /**
  * Definition of a Character that can be created in the game.
  */
@@ -18,6 +13,7 @@ public abstract class Character extends Entity implements WeaponUser {
     protected int attackDice;
     protected int defenseDice;
     protected int bodyPoints;
+    protected int mindPoints;
     protected CombatDiceType defenseType;
 
     /**
@@ -29,17 +25,20 @@ public abstract class Character extends Entity implements WeaponUser {
      * @param sprite String
      */
     public Character(Map map, int x, int y, String sprite, int bodyPoints,
-                     int attackDice, int defenseDice,
+                     int attackDice, int defenseDice, int mindPoints,
                      CombatDiceType defenseType) {
+        super(x, y, sprite, false, false);
         this.map = map;
-        this.x = x;
-        this.y = y;
-        this.sprite = sprite;
         this.bodyPoints = bodyPoints;
+        this.mindPoints = mindPoints;
         this.attackDice = attackDice;
         this.defenseDice = defenseDice;
         this.defenseType = defenseType;
-        this.hidden = false;
+    }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     protected abstract void setStartingEquipment();
@@ -47,33 +46,25 @@ public abstract class Character extends Entity implements WeaponUser {
     public void moveNorth() throws
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
-        try {
-            if(this.map.isAvailable(x - 1, y)) {
-                int oldX = this.x;
-                this.x--;
-
-                //            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
-                //                    this.x, this.y);
-                this.map.updateMap(oldX, this.y);
-            }
-        } catch (PositionDoesNotExistException | CannotWalkOverException |
-                IsTrapException e){
-            throw e;
-        }
+    	try {
+    		this.map.isAvailable(x - 1, y);
+    		int oldX = this.x;
+    		this.x--;
+    		this.map.updateMap(oldX, this.y);
+    	} catch (PositionDoesNotExistException | CannotWalkOverException |
+    			IsTrapException e){
+    		throw e;
+    	}
     }
 
     public void moveSouth() throws
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
         try {
-            if(this.map.isAvailable(x + 1, y)) {
-                int oldX = this.x;
-                this.x++;
-
-                //                System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
-                //                        this.x, this.y);
-                this.map.updateMap(oldX, this.y);
-            }
+            this.map.isAvailable(x + 1, y);
+            int oldX = this.x;
+            this.x++;
+            this.map.updateMap(oldX, this.y);
         } catch (PositionDoesNotExistException | CannotWalkOverException |
                 IsTrapException e) {
             throw e;
@@ -84,14 +75,10 @@ public abstract class Character extends Entity implements WeaponUser {
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
         try {
-            if(this.map.isAvailable(x, y + 1)) {
-                int oldY = this.y;
-                this.y++;
-
-                //System.out.printf("Old (%d, %d); New (%d, %d)\n", this.x, oldY,
-                //        this.x, this.y);
-                this.map.updateMap(this.x, oldY);
-            }
+        	this.map.isAvailable(x, y + 1);
+        	int oldY = this.y;
+        	this.y++;
+        	this.map.updateMap(this.x, oldY);
         } catch (PositionDoesNotExistException | CannotWalkOverException |
                 IsTrapException e) {
             throw e;
@@ -103,14 +90,10 @@ public abstract class Character extends Entity implements WeaponUser {
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
         try {
-            if(this.map.isAvailable(x, y - 1)){
-                int oldY = this.y;
-                this.y--;
-
-                //            System.out.printf("Old (%d, %d); New (%d, %d)\n", oldX, this.y,
-                //                    this.x, this.y);
-                this.map.updateMap(this.x, oldY);
-            }
+        	this.map.isAvailable(x, y - 1);
+        	int oldY = this.y;
+        	this.y--;
+        	this.map.updateMap(this.x, oldY);
         } catch (PositionDoesNotExistException | CannotWalkOverException |
                 IsTrapException e){
             throw e;
@@ -145,6 +128,10 @@ public abstract class Character extends Entity implements WeaponUser {
         return this.bodyPoints;
     }
 
+    public int getMindPoints() {
+        return this.mindPoints;
+    }
+
     /**
      * Method to get character status.
      *
@@ -152,9 +139,10 @@ public abstract class Character extends Entity implements WeaponUser {
      */
     public String getStatus() {
         String s = String.format(
-                "Sprite: %s, Positon: (%d, %d), Body points: %d, Attack " +
-                        "dice: %d, Defense dice: %d",
-                this.sprite, this.x, this.y, this.bodyPoints, this.attackDice,
+                "Sprite: %s, Positon: (%d, %d), Body points: %d, Mind " +
+                        "points: %d, Attack dice: %d, Defense dice: %d",
+                this.sprite, this.x, this.y, this.bodyPoints,
+                this.mindPoints, this.attackDice,
                 this.defenseDice);
         return s;
     }
