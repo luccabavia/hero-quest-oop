@@ -6,9 +6,6 @@ import java.util.Scanner;
  * Manage input interactions through the keyboard.
  */
 public class Keyboard {
-
-    // Refatorar: implementação em forma de singleton
-
     /**
      * Get user keyboard input.
      * @return a string containing given input.

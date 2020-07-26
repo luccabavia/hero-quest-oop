@@ -85,7 +85,7 @@ public class ImportFromFile {
         String[][] position = new String[lines.length][];
         int k = 0;
         for (String s : lines) {
-            position[k] = lines[k].split(" ");
+            position[k] = s.split(" ");
             k++;
         }
 
