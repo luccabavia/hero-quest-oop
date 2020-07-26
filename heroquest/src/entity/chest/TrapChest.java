@@ -4,7 +4,6 @@ import exceptions.MonsterHiddenInChestException;
 
 public class TrapChest extends Chest {
 
-
     public TrapChest(int x, int y) {
         super(x, y);
     }
