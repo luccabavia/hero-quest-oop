@@ -33,7 +33,10 @@ public class Game {
 
     public void startGameLoop() {
         exit = false;
-        System.out.println("Game started!");
+        Display.printWarning("Game started!");
+        Display.printWarning("Collect items and fight monsters! If you kill " +
+                "all monsters, or get killed the game ends! While in your " +
+                "movement phase, you can quit the game.");
         StringBuilder finalMessage = new StringBuilder("Final message: ");
 
         while (!exit) {
@@ -53,8 +56,8 @@ public class Game {
             }
         }
         drawBoard();
-        Display.print(finalMessage.toString());
-        Display.print("Game terminated. Bye!");
+        Display.printWarning(finalMessage.toString());
+        Display.printWarning("Game terminated. Bye!");
     }
 
     private void heroRound() throws HeroDiedException, MonstersDiedException,
@@ -620,8 +623,9 @@ public class Game {
     private void monsterAttack() throws HeroDiedException {
 
         ArrayList<Monster> monsters = this.map.getAttackersMonsters();
+        int healthBefore, healthAfter;
+        healthBefore = this.hero.getHealth();
 
-        
         for (Monster m : monsters) {
             try {
             	SkeletonMage skm = (SkeletonMage) m;
@@ -633,11 +637,17 @@ public class Game {
             		skm.castSpell(target);
             	}
             } catch (ClassCastException | NoSpellLeftException e) {
-                Display.printWarning(this.hero.getStatus(true));
                 this.physicalCombat(m, this.hero);
             }
         }
-        if (this.hero.getHealth() <= 0) {throw new HeroDiedException();}
+        healthAfter = this.hero.getHealth();
+        if (healthBefore != healthAfter) {
+            Display.printWarning(
+                    String.format("You received %d points of damage! ",
+                            healthAfter-healthBefore)
+            );
+        }
+        if (healthAfter <= 0) {throw new HeroDiedException();}
 
     }
 
