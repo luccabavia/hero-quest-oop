@@ -5,6 +5,9 @@ import item.treasure.*;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Class used to generate all Treasure which will set inside chest
+ */
 public class TreasureGenerator {
 
     private static TreasureGenerator instance;
@@ -17,6 +20,11 @@ public class TreasureGenerator {
         return instance;
     }
 
+    /**
+     * Method use to generate a Treasure
+     * @param itemType
+     * @return
+     */
     public Collectible generateItem(TreasureType itemType) {
 
         switch (itemType) {
@@ -30,6 +38,11 @@ public class TreasureGenerator {
         return null;
     }
 
+    /**
+     * Method use to set a maxNumber of random Treasure types to set inside a Chest
+     * @param maxNumber
+     * @return
+     */
     public ArrayList<Collectible> generateMultipleRandomEntities(
             int maxNumber) {
 

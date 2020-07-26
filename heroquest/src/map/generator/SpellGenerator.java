@@ -7,6 +7,9 @@ import map.Map;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Class used to generate all Spell which will set inside chest
+ */
 public class SpellGenerator {
 
     private Map map;
@@ -24,6 +27,11 @@ public class SpellGenerator {
         this.map = map;
     }
 
+    /**
+     * Method use to generate a Spell
+     * @param itemType
+     * @return
+     */
     public Collectible generateItem(SpellType itemType) {
 
         switch (itemType) {
@@ -38,7 +46,11 @@ public class SpellGenerator {
         }
         return null;
     }
-
+    /**
+     * Method use to set a maxNumber of random Spells types to set inside a Chest
+     * @param maxNumber
+     * @return
+     */
     public ArrayList<Collectible> generateMultipleRandomEntities(
             int maxNumber) {
 

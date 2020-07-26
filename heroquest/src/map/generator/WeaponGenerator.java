@@ -9,6 +9,9 @@ import item.equipment.weapon.WeaponType;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Class used to generate all Weapon which will set inside chest
+ */
 public class WeaponGenerator {
 
     private static WeaponGenerator instance;
@@ -21,6 +24,11 @@ public class WeaponGenerator {
         return instance;
     }
 
+    /**
+     * Method use to generate a Weapon
+     * @param itemType
+     * @return
+     */
     public Collectible generateItem(WeaponType itemType) {
 
         switch (itemType) {
@@ -35,6 +43,11 @@ public class WeaponGenerator {
         }
     }
 
+    /**
+     * Method use to set a maxNumber of random Weapon types to set inside a Chest
+     * @param maxNumber
+     * @return
+     */
     public ArrayList<Collectible> generateMultipleRandomEntities(
             int maxNumber) {
 

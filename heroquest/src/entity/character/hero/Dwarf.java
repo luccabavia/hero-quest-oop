@@ -3,9 +3,6 @@ package entity.character.hero;
 import item.equipment.weapon.ShortSword;
 import map.Map;
 
-/**
- * Define Dwarf hero type
- */
 public class Dwarf extends Hero {
 
     public Dwarf(Map map, int x, int y, String name) {

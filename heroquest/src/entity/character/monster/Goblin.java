@@ -28,6 +28,10 @@ public class Goblin extends Monster {
         this.weapon = this.weaponPocket.remove(0);
     }
 
+    /**
+     * Method to do Goblin kind of movements: This monster always 
+     * by try to be closer of Hero
+     */
     @Override
     public void move() {
 

@@ -1,10 +1,14 @@
 package entity.character;
 
+/**
+ * Interface of an Armor user
+ *
+ */
 public interface ArmorUser {
 
-    /**
-     * Get armor defense bonus
-     * @return int value of defense bonus
+	/**
+     * Get equipped weapon's defense.
+     * @return int equipped armor's defense
      */
     int getArmorDefense();
 

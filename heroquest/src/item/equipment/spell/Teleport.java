@@ -18,6 +18,10 @@ public class Teleport extends Spell {
         this.map = map;
     }
 
+    /**
+     * Method to cast teleport spell which is featured by go from actual position to a new selected
+     * position by user when this position is visible and available
+     */
     @Override
     public void castSpell(Target target) {
 

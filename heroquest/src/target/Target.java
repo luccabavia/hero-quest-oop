@@ -1,5 +1,9 @@
 package target;
 
+/**
+ * Container class of possibilities spells targets
+ * Target can be a position, a Character or both
+ */
 import entity.character.Character;
 
 import java.util.ArrayList;

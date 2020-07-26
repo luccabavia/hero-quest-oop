@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
+/**
+ * Class used to generate all Trap which will set on Map
+ */
 public class TrapGenerator {
 
     private Map map;
@@ -26,6 +29,12 @@ public class TrapGenerator {
         this.map = map;
     }
 
+    /**
+     * Method use to generate a Trap
+     * @param damage
+     * @param position
+     * @throws InvalidGeneratorSeedException
+     */
     private void generateEntity(int damage, int[] position)
             throws InvalidGeneratorSeedException {
 
@@ -42,7 +51,10 @@ public class TrapGenerator {
             );
         }
     }
-
+    /**
+     * Method use to set multiples Traps can be set on map
+     * @param hashMap
+     */
     public void generateMultipleEntities(
             HashMap<Integer, int[][]> hashMap)  {
 
@@ -61,7 +73,10 @@ public class TrapGenerator {
             }
         }
     }
-
+    /**
+     * Method use to set random positions and damage Traps can be set on map
+     * @param maxNumberOfEntities
+     */
     public void generateMultipleRandomEntities(int maxNumberOfEntities) {
         int remainingEntities= maxNumberOfEntities;
         do {

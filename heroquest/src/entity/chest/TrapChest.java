@@ -1,7 +1,10 @@
 package entity.chest;
 
 import exceptions.MonsterHiddenInChestException;
-
+/**
+ * Define trap chest than can be created in the game.
+ * This kind of chest create an Monster when Hero try to collect
+ */
 public class TrapChest extends Chest {
 
     public TrapChest(int x, int y) {

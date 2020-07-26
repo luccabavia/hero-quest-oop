@@ -12,6 +12,9 @@ public class SimpleHeal extends Spell {
                 "SimpleHeal", 0, SpellEffectType.BUFFING, 1);
     }
 
+    /**
+     * Method to cast simple heal spell which is featured by give an healing to character
+     */
     @Override
     public void castSpell(Target target) {
         int healValue =

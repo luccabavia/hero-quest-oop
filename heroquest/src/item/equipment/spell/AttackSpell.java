@@ -2,7 +2,9 @@ package item.equipment.spell;
 
 import dice.Dice;
 import entity.character.Character;
-
+/**
+ * Parent class of all Spells used to attack 
+ */
 public abstract class AttackSpell extends Spell {
 
 
@@ -11,6 +13,11 @@ public abstract class AttackSpell extends Spell {
         super(casts, lifeEffect, name, range, type, maxTargets);
     }
 
+    /**
+     * Method to return damage of an Attack Spell
+     * @param target
+     * @param damage
+     */
     protected void damageTarget(Character target, int damage) {
         int defense = Dice.rollCombatDice(target.getMindPoints(),
                 target.getDefenseType());
