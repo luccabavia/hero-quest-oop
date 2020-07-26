@@ -12,9 +12,17 @@ import java.util.Set;
 public class MonsterGenerator {
 
     private Map map;
-    private Random randGenerator = new Random();
+    private static MonsterGenerator instance;
+    private final Random RANDOM = new Random();
 
-    public MonsterGenerator(Map map) {
+    public static MonsterGenerator getInstance() {
+        if (instance == null) {
+            instance = new MonsterGenerator();
+        }
+        return instance;
+    }
+
+    public void setMap(Map map) {
         this.map = map;
     }
 
@@ -73,12 +81,12 @@ public class MonsterGenerator {
         do {
             MonsterType type =
                     MonsterType.values()[
-                            randGenerator.nextInt(
+                            RANDOM.nextInt(
                                     MonsterType.values().length)
                             ];
             int[] position = new int[] {
-                    randGenerator.nextInt(this.map.getMapSize()[0]),
-                    randGenerator.nextInt(this.map.getMapSize()[1])
+                    RANDOM.nextInt(this.map.getMapSize()[0]),
+                    RANDOM.nextInt(this.map.getMapSize()[1])
             };
 
             try {
@@ -95,7 +103,7 @@ public class MonsterGenerator {
             throws InvalidGeneratorSeedException {
         MonsterType type =
                 MonsterType.values()[
-                        randGenerator.nextInt(
+                        RANDOM.nextInt(
                                 MonsterType.values().length)
                         ];
         this.generateEntity(type, position);

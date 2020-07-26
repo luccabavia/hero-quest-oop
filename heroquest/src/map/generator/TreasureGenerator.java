@@ -7,7 +7,15 @@ import java.util.Random;
 
 public class TreasureGenerator {
 
-    private Random randGenerator = new Random();
+    private static TreasureGenerator instance;
+    private final Random RANDOM = new Random();
+
+    public static TreasureGenerator getInstance() {
+        if (instance == null) {
+            instance = new TreasureGenerator();
+        }
+        return instance;
+    }
 
     public Collectible generateItem(TreasureType itemType) {
 
@@ -29,7 +37,7 @@ public class TreasureGenerator {
         int remainingEntities= maxNumber;
         do {
             TreasureType type =
-                    TreasureType.values()[randGenerator.nextInt(
+                    TreasureType.values()[RANDOM.nextInt(
                             TreasureType.values().length)
                             ];
             remainingEntities--;

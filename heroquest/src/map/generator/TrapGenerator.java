@@ -12,9 +12,17 @@ import java.util.Set;
 public class TrapGenerator {
 
     private Map map;
-    private Random randomNumberGenerator = new Random();
+    private static TrapGenerator instance;
+    private final Random RANDOM = new Random();
 
-    public TrapGenerator(Map map) {
+    public static TrapGenerator getInstance() {
+        if (instance == null) {
+            instance = new TrapGenerator();
+        }
+        return instance;
+    }
+
+    public void setMap(Map map) {
         this.map = map;
     }
 
@@ -58,10 +66,10 @@ public class TrapGenerator {
         int remainingEntities= maxNumberOfEntities;
         do {
 
-            int damage = randomNumberGenerator.nextInt(3) + 1;
+            int damage = RANDOM.nextInt(3) + 1;
             int[] position = new int[] {
-                    randomNumberGenerator.nextInt(this.map.getMapSize()[0]),
-                    randomNumberGenerator.nextInt(this.map.getMapSize()[1])
+                    RANDOM.nextInt(this.map.getMapSize()[0]),
+                    RANDOM.nextInt(this.map.getMapSize()[1])
             };
 
             try {

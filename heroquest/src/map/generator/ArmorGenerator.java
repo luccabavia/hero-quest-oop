@@ -8,7 +8,15 @@ import java.util.Random;
 
 public class ArmorGenerator {
 
-    private Random randGenerator = new Random();
+    private static ArmorGenerator instance;
+    private final Random RANDOM = new Random();
+
+    public static ArmorGenerator getInstance() {
+        if (instance == null) {
+            instance = new ArmorGenerator();
+        }
+        return instance;
+    }
 
     public Collectible generateItem(ArmorTypes itemType) {
 
@@ -28,7 +36,7 @@ public class ArmorGenerator {
         int remainingEntities= maxNumber;
         do {
             ArmorTypes type =
-                    ArmorTypes.values()[randGenerator.nextInt(
+                    ArmorTypes.values()[RANDOM.nextInt(
                                     ArmorTypes.values().length)
                             ];
             remainingEntities--;

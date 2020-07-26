@@ -10,9 +10,17 @@ import java.util.Random;
 public class SpellGenerator {
 
     private Map map;
-    private Random randGenerator = new Random();
+    private static SpellGenerator instance;
+    private final Random RANDOM = new Random();
 
-    public SpellGenerator(Map map) {
+    public static SpellGenerator getInstance() {
+        if (instance == null) {
+            instance = new SpellGenerator();
+        }
+        return instance;
+    }
+
+    public void setMap(Map map) {
         this.map = map;
     }
 
@@ -38,7 +46,7 @@ public class SpellGenerator {
         int remainingEntities= maxNumber;
         do {
             SpellType type =
-                    SpellType.values()[randGenerator.nextInt(
+                    SpellType.values()[RANDOM.nextInt(
                             SpellType.values().length)
                             ];
             remainingEntities--;

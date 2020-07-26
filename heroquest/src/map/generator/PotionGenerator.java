@@ -8,7 +8,15 @@ import java.util.Random;
 
 public class PotionGenerator {
 
-    private Random randGenerator = new Random();
+    private static PotionGenerator instance;
+    private final Random RANDOM = new Random();
+
+    public static PotionGenerator getInstance() {
+        if (instance == null) {
+            instance = new PotionGenerator();
+        }
+        return instance;
+    }
 
     public Collectible generateItem(PotionType potionTypes) {
 
@@ -28,7 +36,7 @@ public class PotionGenerator {
         int remainingEntities= maxNumber;
         do {
             PotionType type =
-                    PotionType.values()[randGenerator.nextInt(
+                    PotionType.values()[RANDOM.nextInt(
                     		PotionType.values().length)
                             ];
             remainingEntities--;

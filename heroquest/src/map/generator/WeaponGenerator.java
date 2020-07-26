@@ -11,7 +11,15 @@ import java.util.Random;
 
 public class WeaponGenerator {
 
-    private Random randGenerator = new Random();
+    private static WeaponGenerator instance;
+    private final Random RANDOM = new Random();
+
+    public static WeaponGenerator getInstance() {
+        if (instance == null) {
+            instance = new WeaponGenerator();
+        }
+        return instance;
+    }
 
     public Collectible generateItem(WeaponType itemType) {
 
@@ -34,7 +42,7 @@ public class WeaponGenerator {
         int remainingEntities= maxNumber;
         do {
             WeaponType type =
-                    WeaponType.values()[randGenerator.nextInt(
+                    WeaponType.values()[RANDOM.nextInt(
                             WeaponType.values().length)
                             ];
             remainingEntities--;

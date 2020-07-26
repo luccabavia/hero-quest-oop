@@ -3,6 +3,8 @@ package map.generator;
 import entity.chest.*;
 import exceptions.*;
 import io.Display;
+import item.equipment.armor.Armor;
+import item.equipment.weapon.Weapon;
 import map.Map;
 import item.Collectible;
 
@@ -14,10 +16,34 @@ import java.util.Set;
 public class ChestGenerator {
 
     protected Map map;
-    private Random randGenerator = new Random();
+    private static ChestGenerator instance;
+    private final Random RANDOM = new Random();
+    private final PotionGenerator POTION_GENERATOR;
+    private final WeaponGenerator WEAPON_GENERATOR;
+    private final ArmorGenerator ARMOR_GENERATOR;
+    private final TreasureGenerator TREASURE_GENERATOR;
+    private final SpellGenerator SPELL_GENERATOR;
 
-    public ChestGenerator(Map map) {
+    private ChestGenerator() {
+
+        this.POTION_GENERATOR = PotionGenerator.getInstance();
+        this.WEAPON_GENERATOR = WeaponGenerator.getInstance();
+        this.ARMOR_GENERATOR = ArmorGenerator.getInstance();
+        this.TREASURE_GENERATOR = TreasureGenerator.getInstance();
+        this.SPELL_GENERATOR = SpellGenerator.getInstance();
+
+    }
+
+    public static ChestGenerator getInstance() {
+        if (instance == null) {
+            instance = new ChestGenerator();
+        }
+        return instance;
+    }
+
+    public void setMap(Map map) {
         this.map = map;
+        this.SPELL_GENERATOR.setMap(this.map);
     }
 
     private void generateEntity(boolean isTrap, int[] position,
@@ -28,7 +54,7 @@ public class ChestGenerator {
             if (this.map.isAvailable(position[0], position[1])) {
                 if (isTrap) {
                     this.map.setEntity(new TrapChest(position[0],
-                            position[1], true));
+                            position[1]));
                 } else {
                     NormalChest chest = new NormalChest(position[0],
                             position[1]);
@@ -71,10 +97,10 @@ public class ChestGenerator {
         do {
 
             int[] position = new int[] {
-                    randGenerator.nextInt(this.map.getMapSize()[0]),
-                    randGenerator.nextInt(this.map.getMapSize()[1])
+                    RANDOM.nextInt(this.map.getMapSize()[0]),
+                    RANDOM.nextInt(this.map.getMapSize()[1])
             };
-            boolean isTrap = randGenerator.nextBoolean();
+            boolean isTrap = RANDOM.nextBoolean();
 
             try {
                 remainingEntities--;
@@ -90,21 +116,12 @@ public class ChestGenerator {
 
         ArrayList<Collectible> items = new ArrayList<Collectible>();
 
-        PotionGenerator potionGenerator = new PotionGenerator();
-        items.addAll(potionGenerator.generateMultipleRandomEntities(1));
-
-        WeaponGenerator weaponGenerator = new WeaponGenerator();
-        items.addAll(weaponGenerator.generateMultipleRandomEntities(1));
-
-        ArmorGenerator armorGenerator = new ArmorGenerator();
-        items.addAll(armorGenerator.generateMultipleRandomEntities(1));
-
-        TreasureGenerator treasureGenerator = new TreasureGenerator();
-        items.addAll(treasureGenerator.generateMultipleRandomEntities(1));
-
+        items.addAll(this.POTION_GENERATOR.generateMultipleRandomEntities(1));
+        items.addAll(this.WEAPON_GENERATOR.generateMultipleRandomEntities(1));
+        items.addAll(this.ARMOR_GENERATOR.generateMultipleRandomEntities(1));
+        items.addAll(this.TREASURE_GENERATOR.generateMultipleRandomEntities(1));
         if (hasSpellCaster) {
-            SpellGenerator spellGenerator = new SpellGenerator(this.map);
-            items.addAll(spellGenerator.generateMultipleRandomEntities(1));
+            items.addAll(this.SPELL_GENERATOR.generateMultipleRandomEntities(1));
         }
 
         for (Collectible i : items) {
