@@ -3,7 +3,7 @@ package item.equipment.armor;
 public class HeavyArmor extends Armor {
 
     public HeavyArmor() {
-        super("Heavy", 3, 10);
+        super("HeavyArmor", 3);
     }
 
     @Override
