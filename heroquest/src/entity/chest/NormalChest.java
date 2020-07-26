@@ -2,31 +2,28 @@ package entity.chest;
 
 import exceptions.MonsterHiddenInChestException;
 import io.Display;
-import item.Item;
+import item.*;
 
 import java.util.ArrayList;
 
 public class NormalChest extends Chest {
 
-    protected ArrayList<Item> items = new ArrayList<>();
+	protected ArrayList<Collectible> items = new ArrayList<>();
 
     public NormalChest(int x, int y) {
         super(x, y);
     }
 
-    public void addItem(Item item) {
-        items.add(item);
+    public void addItem(Collectible Collectible) {
+        items.add(Collectible);
     }
 
-    public void displayContents() {
-        StringBuilder s = new StringBuilder();
-        int index = 0;
-        for (Item i : items) {
-            s.append(String.format("[%d] %s", index, i.getName()));
-            if (index != items.size()) {s.append("; ");}
-            index++;
+    public String[] displayContents() {
+        String[] contents = new String[this.items.size()];
+        for (int i = 0; i < this.items.size(); i++) {
+            contents[i] = this.items.get(i).getName();
         }
-        Display.print(s.toString());
+        return contents;
     }
 
     public int getSize() {
@@ -38,10 +35,10 @@ public class NormalChest extends Chest {
         return this.getSize() > 0;
     }
 
-    public Item collectItems(int itemIndex) {
-        Item item = items.get(itemIndex).collect();
-        items.remove(item);
-        return item;
+    public Collectible collectItems(int itemIndex) {
+        Collectible Collectible = items.get(itemIndex);
+        items.remove(Collectible);
+        return Collectible;
     }
 
 }
