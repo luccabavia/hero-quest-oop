@@ -4,7 +4,6 @@ import exceptions.IsTrapException;
 import item.equipment.weapon.*;
 import exceptions.CannotWalkOverException;
 import exceptions.PositionDoesNotExistException;
-import io.Display;
 import map.Map;
 import map.MovementDirection;
 
@@ -17,13 +16,13 @@ public class Goblin extends Monster {
 
     public Goblin(Map map, int x, int y) {
         super(map, x, y, "Go", 4, 3,1,
-                5);
+                2, 5);
         this.setStartingEquipment();
     }
 
     protected void setStartingEquipment() {
-        int maxDaggers = 6;
-        for (int i = 0; i < maxDaggers; i++) {
+        int maxDaggersPackages = 3;
+        for (int i = 0; i < maxDaggersPackages; i++) {
             weaponPocket.add(new Dagger());
         }
         this.weapon = this.weaponPocket.remove(0);
@@ -68,12 +67,7 @@ public class Goblin extends Monster {
                 }
             } catch (PositionDoesNotExistException e){
                 steps++;
-//                Display.print(e.getMessage());
             } catch (CannotWalkOverException | IsTrapException e) {
-                steps++;
-//                Display.print(e.getMessage());
-
-                steps--;
                 try {
                     switch (directions.get(1)) {
                         case NORTH:
@@ -92,7 +86,6 @@ public class Goblin extends Monster {
                 } catch (PositionDoesNotExistException | NullPointerException
                         | CannotWalkOverException | IsTrapException e1){
                     steps = 0;
-//                    Display.print(e1.getMessage());
                 }
             }
         }
@@ -100,9 +93,15 @@ public class Goblin extends Monster {
 
     @Override
     public int getAttack() {
-        Weapon usedDagger = this.weapon;
-        this.weapon = this.weaponPocket.remove(0);
-        return this.attackDice + usedDagger.performAttack();
+        int weaponAttack = this.weapon.getAttack();
+        if (this.weapon.getDurability() <= 0) {
+            if (this.weaponPocket.size() > 0) {
+                this.weapon = this.weaponPocket.remove(0);
+            } else {
+                this.weapon = new Fists();
+            }
+        }
+        return this.attackDice + weaponAttack;
     }
 
 }
