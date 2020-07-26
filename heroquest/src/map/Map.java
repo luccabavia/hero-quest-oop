@@ -1,39 +1,48 @@
 package map;
 
-import entity.Entity;
-import entity.character.Character;
-import entity.character.hero.Hero;
-import entity.character.monster.Goblin;
-import entity.character.monster.Monster;
-import entity.character.monster.MonsterType;
-import entity.character.monster.Skeleton;
+import entity.*;
+import entity.character.*;
+import entity.character.hero.*;
+import entity.character.monster.*;
 import entity.chest.Chest;
-import entity.chest.NormalChest;
-import entity.chest.TrapChest;
 import entity.scenery.*;
 import entity.trap.*;
 import exceptions.*;
-import generator.MonsterGenerator;
-import generator.RandomMonsterGenerator;
-import io.Display;
+import map.generator.*;
 import io.ImportFromFile;
-import item.Item;
-import item.equipment.weapon.LongSword;
-import item.equipment.weapon.ShortSword;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Map {
 
-    private static MapMode mapMode;
     private static Map instance;
     private Entity[][][] map;
     private Hero hero;
     private boolean visibility[][];
+    private boolean heroCanCastSpell;
+    private final MonsterGenerator MONSTER_GENERATOR;
+    private final ChestGenerator CHEST_GENERATOR;
+    private final TrapGenerator TRAP_GENERATOR;
 
     private Map() {
         this.importMap();
-//        this.setGameMode();
+
+        this.MONSTER_GENERATOR = MonsterGenerator.getInstance();
+        this.CHEST_GENERATOR = ChestGenerator.getInstance();
+        this.TRAP_GENERATOR = TrapGenerator.getInstance();
+
+        this.MONSTER_GENERATOR.setMap(this);
+        this.CHEST_GENERATOR.setMap(this);
+        this.TRAP_GENERATOR.setMap(this);
+
+    }
+
+    public static Map getInstance() {
+        if (instance == null) {
+            instance = new Map();
+        }
+        return instance;
     }
 
     private void importMap() {
@@ -41,9 +50,8 @@ public class Map {
         String currentDir = System.getProperty("user.dir");
         String path = String.format("%s/%s",
                 currentDir,
-                "heroquest/config/map/default_map_hero_quest.txt"
+                "/heroquest/config/map/default_map_hero_quest.txt"
         );
-//        path = "/heroquest/config/map/test_map.txt";
         this.map = ImportFromFile.importMap(path);
 
         visibility = new boolean[map.length][map[0].length];
@@ -56,28 +64,138 @@ public class Map {
         };
     }
 
-    public int[] setGameMode(MapMode mapMode) {
+    public void setGameMode(MapMode mapMode, Hero hero) throws
+            CannotWalkOverException, PositionDoesNotExistException,
+            IsTrapException {
 
-        int[] startPosition = new int[] {0, 0};
+        try {
+            SpellCaster spellCaster = (SpellCaster) hero;
+            this.heroCanCastSpell = true;
+        } catch (ClassCastException e) {
+            this.heroCanCastSpell = false;
+        }
+        this.placeHero(hero);
+
         switch (mapMode) {
             case RANDOM:
-                // mapa aleatorio
                 this.createRandomMap();
                 break;
             default:
-                // mapa padrao
-//                this.createStandardMap();
-                this.generateStandardMap();
+                this.createStandardMap();
                 break;
         }
-        return startPosition;
+
     }
 
-    public static Map getInstance() {
-        if (instance == null) {
-            instance = new Map();
-        }
-        return instance;
+    private void createStandardMap() {
+
+        HashMap<Boolean, int[][]> chestHashMap = new HashMap<>();
+        int[][] trapChestPositions = new int[][] {
+                {0, 0},
+                {32, 36},
+                {4, 31},
+                {29, 6},
+                {29, 13},
+                {22, 33}
+        };
+        chestHashMap.put(
+                true,
+                trapChestPositions
+        );
+
+        int[][] normalChestPositions = new int[][] {
+                {0, 36},
+                {3, 11},
+                {3, 21},
+                {6, 26},
+                {7, 11},
+                {8, 33},
+                {9, 4},
+                {10, 25},
+                {22, 11},
+                {22, 28},
+                {24, 3},
+                {27, 33},
+                {32, 0}
+        };
+        chestHashMap.put(
+                false,
+                normalChestPositions
+        );
+
+        this.CHEST_GENERATOR.generateMultipleEntities(chestHashMap,
+                heroCanCastSpell);
+
+        HashMap<MonsterType, int[][]> monsterHashMap = new HashMap<>();
+        int[][] goblinPositions = new int[][] {
+                {5, 3},
+                {16, 31},
+                {26, 8}
+        };
+        monsterHashMap.put(
+                MonsterType.GOBLIN,
+                goblinPositions
+        );
+
+        int[][] skeletonPositions = new int[][] {
+        	{8, 28},
+        	{15, 7},
+            {16, 27},
+            {23, 9}
+        };
+        monsterHashMap.put(
+        	   MonsterType.SKELETON,
+               skeletonPositions
+        );
+
+        int[][] skeletonMagePositions = new int[][] {
+        	{4, 15},
+        	{17, 5},
+            {26, 23}
+        };
+        
+        monsterHashMap.put(
+                MonsterType.SKELETON_MAGE,
+                skeletonMagePositions
+        );
+        
+        this.MONSTER_GENERATOR.generateMultipleEntities(monsterHashMap);
+
+        HashMap<Integer, int[][]> trapHashMap = new HashMap<>();
+        int[][] trapPositionsDamage2 = new int[][] {
+            {4, 10},
+            {15, 27}
+        };
+        trapHashMap.put(
+	            2,
+	            trapPositionsDamage2
+	    );
+        
+        
+        int[][] trapPositionsDamage1 = new int[][] {
+            {5, 13},
+            {17, 9},
+            {27, 22},
+            {28, 27}
+        };
+    	trapHashMap.put(
+	            1,
+	            trapPositionsDamage1
+	    );
+        
+        this.TRAP_GENERATOR.generateMultipleEntities(trapHashMap);
+
+    }
+
+    private void createRandomMap() {
+
+        this.CHEST_GENERATOR.generateMultipleRandomEntities(15,
+                heroCanCastSpell);
+
+        this.MONSTER_GENERATOR.generateMultipleRandomEntities(10);
+
+        this.TRAP_GENERATOR.generateMultipleRandomEntities(7);
+
     }
 
     public Chest hasChest(int x, int y) throws
@@ -93,33 +211,30 @@ public class Map {
             return null;
     }
 
-    public void drawMap() {
-        StringBuilder s = new StringBuilder("");
+    public String[][] drawMap() {
+    	int[] mapSize = this.getMapSize();
+    	String[][] mapView = new String[mapSize[0]][mapSize[1]];
         String fog = "??";
-        for (int i = 0; i < map.length; i++){
-            for (int j = 0; j < map[0].length; j++) {
+        
+        for (int i = 0; i < mapSize[0]; i++){
+            for (int j = 0; j < mapSize[1]; j++) {
                 if(visibility[i][j]) {
                     if (map[i][j][1] != null) {
                         if (!map[i][j][1].isHidden()) {
-                            s.append(map[i][j][1].getSprite());
+                        	mapView[i][j] = map[i][j][1].getSprite();
                         } else {
-                            s.append(map[i][j][0].getSprite());
+                        	mapView[i][j] = map[i][j][0].getSprite();
                         }
                     } else {
-                        s.append(map[i][j][0].getSprite());
+                    	mapView[i][j] = map[i][j][0].getSprite();
                     }
                 } else {
-                    s.append(fog);
-                }
-
-                if (j != map[0].length - 1) {
-                    s.append(" ");
+                	mapView[i][j] = fog;
                 }
 
             }
-            s.append("\n");
         }
-        System.out.println(s.toString());
+        return mapView;
     }
 
     private boolean positionExists(int x, int y) throws
@@ -144,13 +259,20 @@ public class Map {
                 );
             }
             if (this.map[x][y][1] != null) {
-                if(this.map[x][y][1].getSprite().contains("Trap")) {
-                    throw new IsTrapException(
-                            String.format("Cannot walk over Trap")
-                    );
+                if(this.map[x][y][1].isHidden()) {
+                    try {
+                        int damage = ((Trap) this.map[x][y][1]).getDamage();
+                        throw new IsTrapException(
+                                String.format("GOTCHA!! You suffered %d " +
+                                        "damage from a trap!\n", damage),
+                                x, y, damage
+                        );
+                    } catch (ClassCastException e) {
+                        throw e;
+                    }
                 } else {
                     throw new CannotWalkOverException(
-                        String.format("Cannot walk over occupied position")
+                        String.format("Cannot walk over occupied position because of %s", this.map[x][y][1].getSprite())
                     );
                 }
             }
@@ -181,131 +303,15 @@ public class Map {
         return isEmpty && exists;
     }
 
-    public void placeHero(Hero hero) throws
+    private void placeHero(Hero hero) throws
             CannotWalkOverException, PositionDoesNotExistException,
             IsTrapException {
         this.hero = hero;
-        this.setEntity((Entity) hero);
+        this.setEntity(hero);
     }
 
     public int[] getHeroPosition() {
         return this.hero.getPosition();
-    }
-
-    private void createStandardMap() {
-
-        int[][] skeletonPositions = new int[][] {{12, 18}, {1, 1}, {3, 3},
-                {2, 4}};
-        int[][] goblinPositions = new int[][] {{15, 16}};
-        int[][] trapPositions = new int[][] {{0, 1}, {1, 0}};
-
-        for (int[] pos: skeletonPositions) {
-            this.map[pos[0]][pos[1]][1] = new Skeleton(
-                    this,
-                    pos[0],
-                    pos[1]);
-        }
-
-        for (int[] pos: goblinPositions) {
-            this.map[pos[0]][pos[1]][1] = new Goblin(
-                    this,
-                    pos[0],
-                    pos[1]);
-        }
-
-        int[][] chestPosition = new int[][] {
-                {0, 5},
-                {0, 8}
-        };
-
-        int[][] trapChestPosition = new int[][] {
-                {5, 0}
-        };
-
-        Item longSword = new LongSword();
-        Item shortSword = new ShortSword();
-
-        for (int[] pos: chestPosition) {
-            NormalChest chest = new NormalChest(pos[0], pos[1]);
-            chest.addItem(longSword);
-            chest.addItem(shortSword);
-            this.map[pos[0]][pos[1]][1] = chest;
-        }
-
-        for (int[] pos: trapChestPosition) {
-            TrapChest chest = new TrapChest(pos[0], pos[1], true);
-            this.map[pos[0]][pos[1]][1] = chest;
-        }
-
-//        for (int[] pos: trapPositions) {
-//            this.map[pos[0]][pos[1]][1] = new Trap(
-//                    "Trap",
-//                    pos[0],
-//                    pos[1],
-//                    3);
-//        }
-
-    }
-
-    private void generateStandardMap() {
-
-        MonsterType[] monsterTypes = new MonsterType[] {
-                MonsterType.SKELETON,
-                MonsterType.SKELETON,
-                MonsterType.SKELETON,
-                MonsterType.SKELETON,
-                MonsterType.GOBLIN
-        };
-
-        int[][] monstersPositions = new int[][] {
-                {12, 18},
-                {1, 1},
-                {3, 3},
-                {2, 4},
-                {15, 16}
-        };
-
-        MonsterGenerator monsterGenerator = new MonsterGenerator(this);
-        try {
-            ArrayList<Entity> monsters = monsterGenerator.generateMultipleEntities(
-                    monsterTypes,
-                    monstersPositions
-            );
-
-            for (Entity entity:monsters) {
-                this.setEntity(entity);
-            }
-        } catch (InvalidGeneratorSeedException e) {
-            e.printStackTrace();
-        } catch (PositionDoesNotExistException e) {
-            e.printStackTrace();
-        } catch (IsTrapException e) {
-            e.printStackTrace();
-        } catch (CannotWalkOverException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void createRandomMap() {
-
-        RandomMonsterGenerator randomMonsters =
-                new RandomMonsterGenerator(this, MonsterType.values());
-        ArrayList<Entity> monsters =
-                randomMonsters.generateMultipleRandomEntities(10);
-
-        for (Entity entity:monsters) {
-            try {
-                this.setEntity(entity);
-            } catch (PositionDoesNotExistException e) {
-                e.printStackTrace();
-            } catch (CannotWalkOverException e) {
-                e.printStackTrace();
-            } catch (IsTrapException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public ArrayList<Monster> getMonster() {
@@ -328,104 +334,154 @@ public class Map {
         return monsters;
     }
 
-    /**
-     * Return a List of all Monster inside Hero´s Range
-     * @param range
-     * @return
-     */
+  
     public ArrayList<Monster> getMonstersToAttack(int range) {
+    	ArrayList<Monster> monsters = new ArrayList<>();
+    	
+    	int[] heroPos = this.hero.getPosition();
+    	
+    	ArrayList<Entity> entities = getEntityInRange(range, heroPos[0], heroPos[1]);
+    	
+    	for(Entity ent: entities) {
+    		try {
+    			Monster m = (Monster) ent;
+    			monsters.add(m);
+    		} catch (ClassCastException e) {
+    			
+    		}
+    	}
+    	return monsters;
+    }
+    
+    
+    private ArrayList<Entity> getEntityInRange(int range, int x, int y) {
 
-        ArrayList<Monster> monsters = new ArrayList<>();
-        int[] heroPosition = this.hero.getPosition();
-        int[] heroStart = new int[2];
-
-        heroStart[0] = heroPosition[0] - range;
-        heroStart[1] = heroPosition[1] - range;
-
-        if (heroStart[0] < 0) {
-            heroStart[0] = 0;
+    	ArrayList<Entity> entities = new ArrayList<>();
+        
+        boolean stop = true;
+        for (int i = y + 1; i < this.map[0].length && i <= y + range && stop; i++) {
+        	if(!this.map[x][i][0].isSeeThrough())
+        		stop = false;
+        	if (this.map[x][i][1] != null) {
+        			if(this.visibility[x][i])
+        				entities.add(this.map[x][i][1]);
+        			stop = false;
+        	}
         }
-        if (heroStart[1] < 0) {
-            heroStart[1] = 0;
+
+        stop = true;
+        for (int i = y - 1; i >= 0 && i >= y - range && stop; i--) {
+        	if(!this.map[x][i][0].isSeeThrough())
+        		stop = false;
+        	if (this.map[x][i][1] != null) {
+        			if(this.visibility[x][i])
+        				entities.add(this.map[x][i][1]);
+        			stop = false;
+        	}
         }
 
-        for (int i = heroStart[0]; i < this.map.length &&
-                i <= heroPosition[0] + range; i++) {
-            for (int j = heroStart[1]; j < this.map[0].length &&
-                    j <= heroPosition[1] + range; j++) {
-                if (this.map[i][j][1] != null) {
-                    try {
-                        Monster monster = (Monster) this.map[i][j][1];
-                        if(this.visibility[i][j] &&
-                                (this.map[i][j][0].getSprite().contains("[]")
-                                        || this.map[heroPosition[0]][heroPosition[1]][0].getSprite().contains("[]")
-                                        || this.map[i][j][0].getSprite().equalsIgnoreCase(this.map[heroPosition[0]][heroPosition[1]][0].getSprite())))
-                            monsters.add(monster);
-                    } catch (ClassCastException e) {
-
-                    }
-
-                }
-            }
+        stop = true;
+        for (int i = x + 1; i < this.map.length && i <= x + range && stop; i++) {
+        	if(!this.map[i][y][0].isSeeThrough())
+        		stop = false;
+        	if (this.map[i][y][1] != null) {
+        		if(this.visibility[i][y])
+        			entities.add(this.map[i][y][1]);
+        		stop = false;
+        	}
         }
-        return monsters;
+
+        stop = true;
+        for (int i = x - 1; i >= 0 && i >= x - range && stop; i--) {
+        	if(!this.map[i][y][0].isSeeThrough())
+        		stop = false;
+        	if (this.map[i][y][1] != null) {
+        		if(this.visibility[i][y])
+        			entities.add(this.map[i][y][1]);
+        		stop = false;
+        	}	
+        }
+        return entities;
     }
 
     /**
-     * Return a List of all Monsters which have Hero inside your weapon Range
+     * Return a List of all Monsters which have Hero inside your
+     * weapon Range
      * @return
      */
     public ArrayList<Monster> getAttackersMonsters() {
-
-        int[] heroPosition = this.hero.getPosition();
-        int range;
-        int distX, distY;
+        int range = 0;
+        int[] monsterPos;
+        ArrayList<Monster> allMonsters = this.getMonster();
         ArrayList<Monster> monsters = new ArrayList<>();
-        for (int i = 0; i < this.map.length; i++) {
-            for (int j = 0; j < this.map[0].length; j++) {
-                if (this.map[i][j][1] != null) {
-                    try {
-                        Monster monster = (Monster) this.map[i][j][1];
-                        if(Math.abs(i-heroPosition[0]) > 0)
-                            distX = Math.abs(i-heroPosition[0]);
-                        else
-                            distX = 1;
-                        if(Math.abs(j-heroPosition[1]) > 0)
-                            distY = Math.abs(j-heroPosition[1]);
-                        else
-                            distY = 1;
-                        //Teste de Range do Monstro mudar para função getRange do weapon monster
-                        range = monster.getEquippedWeaponRange();
-                        if(range*range >= distX * distY &&
-                                (this.map[i][j][0].getSprite().contains("[]")
-                                        || this.map[i][j][0].getSprite() == this.map[heroPosition[0]][heroPosition[1]][0].getSprite()))
-                            monsters.add(monster);
-                    } catch (ClassCastException e) {
-                    }
 
+        for(Monster m: allMonsters) {
+        	monsterPos = m.getPosition();
+        	try {
+        		SpellCaster spellCaster = (SpellCaster) m;
+        		spellCaster.hasSpells();
+        		range = spellCaster.getEquippedSpellRange();
+        	} catch (ClassCastException | NoSpellLeftException e) {
+        		range = m.getEquippedWeaponRange();
+        	}
+
+        	ArrayList<Entity> entities = getEntityInRange(range, monsterPos[0], monsterPos[1]);
+        	for(Entity ent: entities) {
+        		try {
+        			Hero h = (Hero) ent;
+        			monsters.add(m);
+        		} catch (ClassCastException e) {
+        		}
+        	}
+
+        }
+        
+        return monsters;
+    }
+
+    public ArrayList<Monster> getCharactersAround(int x, int y) {
+        ArrayList<Monster> monsters = new ArrayList<>();
+
+        int[][] adjacentPositions = new int[][] {
+                {x, y + 1},       // East
+                {x - 1, y + 1},   // Northeast
+                {x - 1, y},       // North
+                {x - 1, y - 1},   // Northwest
+                {x, y - 1},       // West
+                {x + 1, y - 1},   // Southwest
+                {x + 1, y},       // South
+                {x + 1, y + 1}    // Southeast
+        };
+
+        for (int[] position:adjacentPositions) {
+            try {
+                if (this.map[position[0]][position[1]][1] != null) {
+                    monsters.add(
+                            (Monster) this.map[position[0]][position[1]][1]
+                    );
                 }
+            } catch (ClassCastException e) {
+                continue;
             }
         }
+
         return monsters;
     }
 
     public void setEntity(Entity ent) throws
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
-        int pos[] = ent.getPosition();
+        int[] pos = ent.getPosition();
         try {
-            if(isAvailable(pos[0], pos[1]))
-                this.map[pos[0]][pos[1]][1]= ent;
-
-        } catch (PositionDoesNotExistException e) {
-            throw e;
-        } catch (CannotWalkOverException e) {
+            isAvailable(pos[0], pos[1]);
+            this.map[pos[0]][pos[1]][1]= ent;
+        } catch (PositionDoesNotExistException | CannotWalkOverException | IsTrapException e) {
             throw e;
         }
     }
 
     public void removeEntity(Entity entity) {
-        int pos[] = entity.getPosition();
+        int[] pos = entity.getPosition();
         this.map[pos[0]][pos[1]][1] = null;
     }
 
@@ -434,30 +490,32 @@ public class Map {
         return monsters.size() > 0;
     }
 
-    public int trapEffect(int x, int y) {
+    public void disarmTrapChest(int[] position) {
+
+        this.removeEntity((Chest) this.map[position[0]][position[1]][1]);
+        try {
+            this.MONSTER_GENERATOR.generateRandomEntityAtPosition(position);
+        } catch (InvalidGeneratorSeedException e) {
+        }
+    }
+
+    public void disarmTrap(int x, int y) {
+
         Trap trap = (Trap) this.map[x][y][1];
-        int damage = trap.getDamage();
-        this.hero.sufferEffect(-damage);
-        this.map[x][y][1] = null;
-        return damage;
+        this.removeEntity(trap);
+        int[] oldPosition = this.hero.getPosition();
+        this.hero.setPosition(x, y);
+        this.updateMap(oldPosition[0], oldPosition[1]);
 
     }
 
     public void updateMap(int oldX, int oldY) {
 
-        Entity ent = this.map[oldX][oldY][1];
-        int[] pos = ent.getPosition();
+        Entity entity = this.map[oldX][oldY][1];
+        int[] pos = entity.getPosition();
 
-        this.map[pos[0]][pos[1]][1] = ent;
+        this.map[pos[0]][pos[1]][1] = entity;
         this.map[oldX][oldY][1] = null;
-    }
-
-    public void viewAllMap() {
-        for (int i = 0; i < map.length; i++){
-            for (int j = 0; j < map[0].length; j++) {
-                visibility[i][j] = true;
-            }
-        }
     }
 
     public void updateVisibility() {
@@ -468,8 +526,7 @@ public class Map {
         boolean stop = true;
         for (int i = heroPos[1] + 1; i < this.map[0].length && stop; i++) {
             try{
-                if((!this.map[heroPos[0]][i][0].getSprite().contains("==") &&
-                        !this.map[heroPos[0]][i][0].getSprite().contains("++"))
+                if(!this.map[heroPos[0]][i][0].isSeeThrough()
                         || !positionIsEmpty(heroPos[0], i))
                     stop = false;
             } catch (CannotWalkOverException e) {
@@ -483,8 +540,7 @@ public class Map {
         stop = true;
         for (int i = heroPos[1] - 1; i > 0 && stop; i--) {
             try{
-                if((!this.map[heroPos[0]][i][0].getSprite().contains("==")
-                        && !this.map[heroPos[0]][i][0].getSprite().contains("++"))
+                if(!this.map[heroPos[0]][i][0].isSeeThrough()
                         || !positionIsEmpty(heroPos[0], i))
                     stop = false;
             } catch (CannotWalkOverException e) {
@@ -498,8 +554,7 @@ public class Map {
         stop = true;
         for (int i = heroPos[0] + 1; i < this.map.length && stop; i++) {
             try{
-                if((!this.map[i][heroPos[1]][0].getSprite().contains("==")
-                        && !this.map[i][heroPos[1]][0].getSprite().contains("++"))
+                if(!this.map[i][heroPos[1]][0].isSeeThrough()
                         ||  !positionIsEmpty(i, heroPos[1]))
                     stop = false;
             } catch (CannotWalkOverException e) {
@@ -513,8 +568,7 @@ public class Map {
         stop = true;
         for (int i = heroPos[0] - 1; i > 0 && stop; i--) {
             try{
-                if((!this.map[i][heroPos[1]][0].getSprite().contains("==")
-                        && !this.map[i][heroPos[1]][0].getSprite().contains("++"))
+                if(!this.map[i][heroPos[1]][0].isSeeThrough()
                         ||  !positionIsEmpty(i, heroPos[1]))
                     stop = false;
             } catch (CannotWalkOverException e) {
@@ -524,5 +578,9 @@ public class Map {
             }
             visibility[i][heroPos[1]] = true;
         }
+    }
+
+    public boolean isVisible(int x, int y) {
+        return this.visibility[x][y];
     }
 }
