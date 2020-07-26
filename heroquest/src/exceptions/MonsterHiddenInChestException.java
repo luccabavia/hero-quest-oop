@@ -4,7 +4,6 @@ import entity.character.monster.MonsterType;
 
 public class MonsterHiddenInChestException extends Exception {
 
-    private MonsterType monsterType;
     private int[] monsterPosition;
 
     public MonsterHiddenInChestException() {
@@ -24,15 +23,9 @@ public class MonsterHiddenInChestException extends Exception {
     }
 
     public MonsterHiddenInChestException(String message,
-                                         MonsterType monsterType,
                                          int[] monsterPosition) {
         super(message);
-        this.monsterType = monsterType;
         this.monsterPosition = monsterPosition;
-    }
-
-    public MonsterType getMonsterType() {
-        return this.monsterType;
     }
 
     public int[] getMonsterPosition() {
