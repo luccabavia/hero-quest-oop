@@ -29,16 +29,16 @@ public abstract class Hero extends Character implements ArmorUser {
 
     /**
      * Constructor method for hero parent class.
-     * @param map
-     * @param x
-     * @param y
-     * @param sprite
-     * @param bodyPoints
-     * @param attackDice
-     * @param defenseDice
-     * @param movementDice
-     * @param mindPoints
-     * @param name
+     * @param map map where game is played
+     * @param x starting column
+     * @param y starting row
+     * @param sprite sprite used for visualization
+     * @param bodyPoints int value of health
+     * @param attackDice int amount of dices rolled on attack
+     * @param defenseDice int amount of dices rolled on defense
+     * @param movementDice int amount of dices rolled for movement
+     * @param mindPoints int amount of intelligence points
+     * @param name hero's name
      */
     public Hero(Map map, int x, int y, String sprite, int bodyPoints,
                 int attackDice, int defenseDice, int movementDice,
@@ -78,14 +78,26 @@ public abstract class Hero extends Character implements ArmorUser {
         return null;
     }
 
+    /**
+     * Add a collectible item to the hero's bag
+     * @param item collectible item
+     */
     public void addItemToBag(Collectible item) {
         this.bag.addItem(item);
     }
 
+    /**
+     * Get a string representation for items in bag
+     * @return string containing items in bag
+     */
     public String getItemsInBag() {
         return this.bag.displayItems();
     }
-    
+
+    /**
+     * Check if hero has a potion in bag
+     * @return if hero has potion
+     */
     public boolean hasPotionInBag() {
     	return this.bag.hasPotion();
     }
@@ -216,6 +228,10 @@ public abstract class Hero extends Character implements ArmorUser {
         }
     }
 
+    /**
+     * Set equipped armor
+     * @param armor armor selected
+     */
     protected void setArmor(Armor armor) {
         if (this.equippedArmor != null) {
             this.addItemToBag(this.equippedArmor);
@@ -224,6 +240,13 @@ public abstract class Hero extends Character implements ArmorUser {
         this.equippedArmor = armor;
     }
 
+    /**
+     * Implementation of interface method, set used weapon to selected hand
+     * @param weaponIndexInBag int index from hero's bag
+     * @param usedHand selected hand to equip weapon
+     * @throws InvalidItemException thrown when an item that is not a weapon
+     * is selected to be equipped
+     */
     public void setEquippedWeapon(int weaponIndexInBag, OccupiedHand usedHand)
             throws InvalidItemException {
         try {
@@ -298,6 +321,9 @@ public abstract class Hero extends Character implements ArmorUser {
 
     }
 
+    /**
+     * Store weapon currently equipped in left hand in bag
+     */
     private void storeLeftHandWeapon() {
         if (this.leftHandWeapon != null) {
             this.addItemToBag(this.leftHandWeapon);
@@ -305,6 +331,9 @@ public abstract class Hero extends Character implements ArmorUser {
         }
     }
 
+    /**
+     * Store weapon currently equipped in right hand in bag
+     */
     private void storeRightHandWeapon() {
         if (this.rightHandWeapon != null) {
             this.addItemToBag(this.rightHandWeapon);
@@ -312,6 +341,9 @@ public abstract class Hero extends Character implements ArmorUser {
         }
     }
 
+    /**
+     * Store weapon currently equipped in both hands in bag
+     */
     private void storeDualWieldingWeapon() {
         if (this.dualWieldingWeapon != null) {
             this.addItemToBag(this.dualWieldingWeapon);
@@ -342,6 +374,12 @@ public abstract class Hero extends Character implements ArmorUser {
         return this.getAttackDice(this.usedHand);
     }
 
+    /**
+     * Use potion
+     * @param bagIndex int index in bag
+     * @throws InvalidItemException thrown when a item that is not a potion
+     * is selected
+     */
     public void usePotion(int bagIndex) throws InvalidItemException {
         try {
             this.sufferEffect(((Potion) this.bag.getItem(bagIndex)).usePotion());
