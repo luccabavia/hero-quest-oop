@@ -1,30 +1,25 @@
-import battle.Battle;
+import dice.CombatDiceType;
 import dice.Dice;
-import entity.Entity;
 import entity.character.Character;
+import entity.character.SpellCaster;
 import entity.character.hero.*;
-import entity.character.monster.Goblin;
-import entity.character.monster.Monster;
-import entity.character.monster.Skeleton;
-import entity.character.monster.SkeletonMage;
-import entity.chest.Chest;
-import entity.chest.NormalChest;
-import entity.trap.Trap;
+import entity.character.monster.*;
+import entity.chest.*;
 import io.Display;
 import io.Keyboard;
-import map.Map;
-import map.MapMode;
+import item.equipment.spell.SpellEffectType;
+import map.*;
 import exceptions.*;
+import target.Target;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.InputMismatchException;
 
 public class Game {
 
     private boolean exit;
     private Hero hero;
     private Map map;
-    private Battle battle;
 
     public Game() {
         try {
@@ -41,7 +36,6 @@ public class Game {
         System.out.println("Game started!");
         StringBuilder finalMessage = new StringBuilder("Final message: ");
 
-        int i = 0;
         while (!exit) {
             drawBoard();
             try {
@@ -49,23 +43,28 @@ public class Game {
                 monsterRound();
             } catch (MonstersDiedException e) {
                 finalMessage.append("All monsters killed! You win!!");
-                break;
+                exit=true;
             } catch	(HeroDiedException e){
                 finalMessage.append("You have died! You loose!!");
-                break;
-
+                exit=true;
+            } catch (FinishGameException e) {
+                finalMessage.append(e.getMessage());
+                exit=true;
             }
         }
+        drawBoard();
         Display.print(finalMessage.toString());
         Display.print("Game terminated. Bye!");
     }
 
-    private void heroRound() throws HeroDiedException, MonstersDiedException {
-        //usePotion();
+    private void heroRound() throws HeroDiedException, MonstersDiedException,
+            FinishGameException {
+    	if(this.hero.hasPotionInBag())
+    		usePotion();
         heroMovement();
         changeHeroEquipment();
         heroAction();
-        //drawBoard();
+        drawBoard();
 
     }
 
@@ -81,75 +80,111 @@ public class Game {
         }
     }
 
-    // Decides whether the map is standard or random
+    /**
+     * Sets whether the map is standard or random
+     * @throws CannotWalkOverException
+     * @throws PositionDoesNotExistException
+     * @throws IsTrapException
+     */
     private void configure() throws
             CannotWalkOverException, PositionDoesNotExistException,
             IsTrapException {
-        this.map = Map.getInstance();//MapMode.DEFAULT);
-        int[] startPosition = this.map.setGameMode(MapMode.RANDOM);
+
+        this.map = Map.getInstance();
+        int[] startPosition = new int[] {16, 18};
+        MapMode mapMode;
         do {
             this.hero = selectHero(startPosition);
         } while (this.hero == null);
-        this.map.placeHero(this.hero);
+
+        do {
+            mapMode = selectMapMode();
+        } while (mapMode == null);
+
+        this.map.setGameMode(mapMode, this.hero);
         this.map.updateVisibility();
-        this.map.viewAllMap();
-        this.battle = new Battle();
+    }
+
+    private MapMode selectMapMode() {
+
+        try {
+            String message = "Choose the game mode: " +
+                    "\n[0] Default: monster and items start at the same " +
+                    "position every time\n[1] Random: monster and items start at" +
+                    " random positions";
+            int choice = Keyboard.getIntInput(message);
+            switch (choice) {
+                case 0:
+                    return MapMode.DEFAULT;
+                case 1:
+                    return MapMode.RANDOM;
+                default:
+                    return null;
+            }
+        } catch (InputMismatchException e) {
+            Display.printWarning("Invalid input!");
+            return null;
+        }
     }
 
     private Hero selectHero(int[] startPosition) {
 
-        Hero hero = null;
-        HeroType heroType = this.chooseHero();
-        String heroName = Keyboard.getInput("Escolha o nome do seu herói: ");
-        switch (heroType) {
-            case ELF:
-                hero = new Elf(this.map, startPosition[0],
-                        startPosition[1], heroName);
-                break;
-            case DWARF:
-                hero = new Dwarf(this.map, startPosition[0],
-                        startPosition[1], heroName);
-                break;
-            case WIZARD:
-                hero = new Wizard(this.map, startPosition[0],
-                        startPosition[1], heroName);
-                break;
-            case BARBARIAN:
-                hero = new Barbarian(this.map, startPosition[0],
-                        startPosition[1], heroName);
-                break;
+        String heroName = Keyboard.getInput("Choose your hero name: ");
+        try {
+            String message = "Choose your hero type: " +
+                    "\n[0] Elf\n[1] Dwarf\n[2] Wizard\n[3] Barbarian";
+            int choice = Keyboard.getIntInput(message);
+            switch (choice) {
+                case 0:
+                    hero = new Elf(this.map, startPosition[0],
+                            startPosition[1], heroName);
+                    break;
+                case 1:
+                    hero = new Dwarf(this.map, startPosition[0],
+                            startPosition[1], heroName);
+                    break;
+                case 2:
+                    hero = new Wizard(this.map, startPosition[0],
+                            startPosition[1], heroName);
+                    break;
+                case 3:
+                    hero = new Barbarian(this.map, startPosition[0],
+                            startPosition[1], heroName);
+                    break;
+                default:
+                    hero = null;
+                    break;
+            }
+        } catch (InputMismatchException e) {
+            Display.printWarning("Invalid input!");
         }
 
         return hero;
     }
 
-    private HeroType chooseHero() {
-        Display.print("Available hero types: " +
-                "\n0 - Elf\n1 - Dwarf\n2 - Wizard\n3 - Barbarian");
-        String choice = Keyboard.getInput("Choose your hero type: ");
-        switch (choice) {
-            case "0":
-                return HeroType.ELF;
-            case "1":
-                return HeroType.DWARF;
-            case "2":
-                return HeroType.WIZARD;
-            case "3":
-                return HeroType.BARBARIAN;
-        }
-        return null;
-    }
-
     private void drawBoard(){
-        this.map.drawMap();
+    	this.map.updateVisibility();
+    	StringBuilder s = new StringBuilder();
+    	String[][] map = this.map.drawMap();
+    	
+    	for (int i = 0; i < map.length; i++){
+            for (int j = 0; j < map[i].length - 1; j++) {
+            	s.append(map[i][j]);
+            	s.append(" ");
+            }
+            s.append(map[i][map[i].length - 1]);
+            s.append("\n");
+        }
+    	
+    	Display.print(s.toString());
         Display.print(this.hero.getStatus());
 
     }
 
-    private void heroMovement() throws HeroDiedException {
+    private void heroMovement() throws HeroDiedException, FinishGameException {
         String command;
         int steps = 0;
-        String action= new String();
+        String action;
         do {
 
             Display.print("Press r to roll the Dice");
@@ -163,7 +198,8 @@ public class Game {
                 Display.print("You have "+ (steps) + " moves left.");
                 Display.print(
                         "Use w, a, s, d keys to move, " +
-                                "collect items with i and exit with q."
+                                "p to stop moving and go to action phase, or" +
+                                " exit with q."
                 );
                 action = Keyboard.getInput();
                 steps--;
@@ -180,59 +216,30 @@ public class Game {
                     case "a":
                         this.hero.moveWest();
                         break;
-                    case "i":
-                        steps++;
-                        this.collectItem();
+                    case "p":
+                        steps = 0;
                         break;
                     case "q":
-                        this.exit = true;
-                        break;
+                        throw new FinishGameException("You chose the easy " +
+                                "way out, game ended!");
                     default:
                         steps++;
                         break;
                 }
-                this.map.updateVisibility();
-                this.map.drawMap();
+                this.drawBoard();
             } catch (PositionDoesNotExistException |
                     CannotWalkOverException e) {
                 steps++;
                 Display.print(e.getMessage());
             } catch (IsTrapException e) {
-                int damage = 0;
-                int[] heroPosition = this.hero.getPosition();
+                Display.printWarning(e.getMessage());
+                int damage = e.getDamage();
+                int[] newPosition = e.getTrapPosition();
+                this.hero.sufferEffect(-damage);
+                this.map.disarmTrap(newPosition[0], newPosition[1]);
                 Display.print(this.hero.getStatus());
-                try {
-                    switch (action) {
-                        case "w":
-                            damage = this.map.trapEffect(heroPosition[0] - 1,
-                                    heroPosition[1]);
-                            this.hero.moveNorth();
-                            break;
-                        case "s":
-                            damage = this.map.trapEffect(heroPosition[0] + 1,
-                                    heroPosition[1]);
-                            this.hero.moveSouth();
-                            break;
-                        case "d":
-                            damage = this.map.trapEffect(heroPosition[0],
-                                    heroPosition[1] + 1);
-                            this.hero.moveEast();
-                            break;
-                        case "a":
-                            damage = this.map.trapEffect(heroPosition[0],
-                                    heroPosition[1] - 1);
-                            this.hero.moveWest();
-                            break;
-                    }
-                    System.out.printf("GOTCHA!! You Suffer %d " +
-                            "Damage from a Trap\n", damage);
-                    Display.print(this.hero.getStatus());
-                    this.map.updateVisibility();
-                    this.map.drawMap();
-                } catch (PositionDoesNotExistException |
-                        CannotWalkOverException | IsTrapException e1){
-                    steps++;
-                }
+                this.map.updateVisibility();
+                this.map.drawMap();
             }
             if (this.hero.getHealth() <= 0) {
                 throw new HeroDiedException();
@@ -248,7 +255,16 @@ public class Game {
             if (chest != null && chest.hasContents()) {
                 NormalChest container = (NormalChest) chest;
                 while (chest.hasContents()) {
-                    container.displayContents();
+                    String[] contents = container.displayContents();
+                    StringBuilder s = new StringBuilder();
+                    int index = 0;
+                    for (String i : contents) {
+                        s.append(String.format("[%d] %s", index, i));
+                        if (index != contents.length) {s.append("; ");}
+                        index++;
+                    }
+                    Display.print(s.toString());
+
                     input = Keyboard.getInput("Which items will you " +
                             "collect? Press q to stop collection... ");
                     if (input.equalsIgnoreCase("q")) {
@@ -267,31 +283,8 @@ public class Game {
             }
             Display.print(this.hero.getStatus());
         } catch (MonsterHiddenInChestException e) {
-            int[] position = e.getMonsterPosition();
-            Monster monster;
             Display.printWarning(e.getMessage());
-            switch (e.getMonsterType()) {
-                case GOBLIN:
-                    monster = new Goblin(this.map, position[0], position[1]);
-                    break;
-                case SKELETON_MAGE:
-                    monster = new SkeletonMage(this.map, position[0],
-                            position[1]);
-                    break;
-                default:
-                    monster = new Skeleton(this.map, position[0],
-                            position[1]);
-                    break;
-            }
-            try {
-                this.map.removeEntity(monster);
-                this.map.setEntity(monster);
-            } catch (PositionDoesNotExistException
-                    | IsTrapException
-                    | CannotWalkOverException monsterE) {
-                monsterE.printStackTrace();
-            }
-
+            this.map.disarmTrapChest(e.getMonsterPosition());
         }
     }
 
@@ -300,38 +293,61 @@ public class Game {
         Display.print(this.hero.getStatus());
         String changeEquipment = Keyboard.getInput("Would you like to " +
                 "change equipment? [y/n] ");
+        
+        String messageBoth = "Which" +
+                "equipment would you like to change? " +
+                "\n[0] Armor;\n[1] Weapon;\n[2] Spell;";
+        String messageWeaponUserOnly = "Which" +
+                "equipment would you like to change? " +
+                "\n[0] Armor;\n[1] Weapon;\n";
+        String message;
+        
 
         if (changeEquipment.equalsIgnoreCase("y")) {
             boolean continueChangingEquipment = true;
+            SpellCaster caster = null;
+            
             do {
-                Display.print(this.hero.getItemsInBag());
-                int equipToChange = Integer.parseInt(
-                        Keyboard.getInput("Which" +
-                                "equipment would you like to change? " +
-                                "\n[0] Armor;\n[1] Weapon;\n[2] Spell;")
-                );
-                switch (equipToChange) {
-                    case 0:
-                        changeHeroArmor();
-                        break;
-                    case 1:
-                        changeHeroWeapon();
-                        break;
-                    case 2:
-                        changeHeroSpell();
-                        break;
-                    default:
-                        break;
+            	try {
+                    caster = (SpellCaster) this.hero;
+                    message = messageBoth;
+                } catch (ClassCastException e) {
+                    message = messageWeaponUserOnly;
                 }
+                try {
+                    Display.print(this.hero.getItemsInBag());
+                    int equipToChange = Keyboard.getIntInput(message);
+                    
+                    switch (equipToChange) {
+                        case 0:
+                            changeHeroArmor();
+                            break;
+                        case 1:
+                            changeHeroWeapon();
+                            break;
+                        case 2:
+                        	if (caster != null) {
+	                        		try {
+	                        			caster.hasSpells();
+	                        			changeHeroSpell();
+	                        		} catch (NoSpellLeftException e){
+	                        			 Display.printWarning(e.getMessage());
+	                        		} 
+                        	}	
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (InputMismatchException e) {
+                    Display.printWarning("Invalid index!");
+                }
+
                 if (Keyboard.getInput("Would you like to continue " +
                         "changing your equipment? [y/n] ").equalsIgnoreCase(
                                 "n")) {
                     continueChangingEquipment = false;
                 }
             } while(continueChangingEquipment);
-
-
-
         }
     }
 
@@ -342,6 +358,8 @@ public class Game {
             this.hero.setEquippedArmor(index);
         } catch (InvalidItemException e) {
             Display.printWarning(e.getMessage());
+        } catch (IndexOutOfBoundsException | InputMismatchException e) {
+            Display.printWarning("Invalid index!");
         }
     }
 
@@ -377,106 +395,294 @@ public class Game {
         try {
             this.hero.setEquippedWeapon(index, usedHand);
         } catch (InvalidItemException e) {
-            Display.print(e.getMessage());
+            Display.printWarning(e.getMessage());
+        } catch (IndexOutOfBoundsException | InputMismatchException e) {
+            Display.printWarning("Invalid index!");
         }
     }
 
     private void changeHeroSpell() {
-        int index = Integer.parseInt(Keyboard.getInput("Which spell would " +
-                "you like to equip? [index from bag]"));
+        int index = Keyboard.getIntInput("Which spell would " +
+                "you like to equip? [index from bag]");
         try {
-            this.hero.setEquippedSpell(index);
+            ((SpellCaster) this.hero).setEquippedSpell(index);
+        } catch (ClassCastException e) {
+            Display.printWarning("Your hero cannot use spells!");
         } catch (InvalidItemException e) {
             Display.printWarning(e.getMessage());
+        } catch (IndexOutOfBoundsException | InputMismatchException e) {
+            Display.printWarning("Invalid index!");
         }
     }
 
     private void heroAction() throws MonstersDiedException {
 
-        String mode = Keyboard.getInput("Select action type: p - physical " +
-                "attack, s - spell casting, c - search for treasure");
-        if (mode.equalsIgnoreCase("p")) {
-            this.heroAttack();
-        } else if (mode.equalsIgnoreCase("s")) {
-            // FUNÇÃO PARA USAR SPELL
-        }
+        String messageBoth = "Select action type: " +
+                "[0] Collect item; [1] Physical attack; [2] Spell casting";
+        String messageWeaponUserOnly = "Select action type: " +
+                "[0] Collect item; [1] Physical attack;";
+        String message;
+        boolean stop = false;
+        SpellCaster caster = null;
+        do {
+            try {
+                caster = (SpellCaster) this.hero;
+                message = messageBoth;
+            } catch (ClassCastException e) {
+                message = messageWeaponUserOnly;
+            }
+            try { 
+            	int mode = Keyboard.getIntInput(message);
+            	switch (mode) {
+                case 0:
+                    this.collectItem();
+                    stop = true;
+                    break;
+                case 1:
+                    this.heroAttack();
+                    stop = true;
+                    break;
+                case 2:
+                    if (caster != null) {
+                        try {
+                            this.heroSpell();
+                        } catch (NoSpellLeftException
+                                | NullPointerException e) {
+                            Display.printWarning(e.getMessage());
+                        }
+                        stop = true;
+                    }
+                    break;
+            }
+            } catch (InputMismatchException e) {
+            	Display.printWarning("Invalid index!");
+            }
+            
+        } while(!stop);
 
         if (!this.map.hasMonsters()) {
             throw new MonstersDiedException();
         }
 
-
     }
 
     private void heroAttack() {
         try {
-            Monster monster = selectTarget();
-            battle.physicalCombat(this.hero, monster);
+            Monster monster =
+                    selectTarget(hero.getEquippedWeaponRange(), 1).get(0);
+            this.physicalCombat(this.hero, monster);
+            this.afterActionReport(this.hero, monster);
         } catch (NoAvailableMonstersToAttackException e) {
             Display.printWarning(e.getMessage());
         }
 
     }
+    
+    private void physicalCombat(Character attacker, Character defender) {
+
+        int atk = Dice.rollCombatDice(
+                attacker.getAttack(),
+                CombatDiceType.SKULL
+        );
+
+        int def = Dice.rollCombatDice(
+                defender.getDefense(),
+                defender.getDefenseType()
+        );
+
+        defender.sufferEffect(Math.min(0, -(atk - def)));
+    }
+
+    private void afterActionReport(Character attacker, Character defender) {
+        String report = String.format(
+                "\nAttacker: {%s}\n" +
+                        "Defender: {%s}",
+                attacker.getStatus(true),
+                defender.getStatus(true)
+        );
+        Display.print(report);
+    }
+
+    private void heroSpell() throws NoSpellLeftException,
+            NullPointerException {
+
+        SpellCaster caster = (SpellCaster) this.hero;
+
+        try{ 
+        	caster.hasSpells();
+            SpellEffectType type;
+            try {
+                type = caster.getEquippedSpellType();
+            } catch (NullPointerException e) {
+                throw new NullPointerException("No spell equipped!");
+            }
+            int range = caster.getEquippedSpellRange();
+            Target target = new Target();
+
+            switch (type) {
+                case ATTACK:
+                    try {
+                    	Character c = this.selectTarget(range, 1).get(0);
+                    	target.setCharacter(c);
+                    	this.afterActionReport(this.hero, c);
+                    } catch (NoAvailableMonstersToAttackException e) {
+                        Display.printWarning(e.getMessage());
+                        return;
+                    }
+                    break;
+                case MULTI_ATTACK:
+                    try {
+                        int numberOfTargets = Keyboard.getIntInput(
+                                String.format("You can select up to %d " +
+                                        "targets, how many targets you want " +
+                                        "to attack? ",
+                                        caster.getEquippedSpellMaxTargets())
+                        );
+                        for (Monster m: this.selectTarget(range,
+                                numberOfTargets)) {
+                            target.setCharacter(m);
+                            this.afterActionReport(this.hero, m);
+                        }
+                    } catch (NoAvailableMonstersToAttackException e) {
+                        Display.printWarning(e.getMessage());
+                        return;
+                    }
+                    break;
+                case TRANSPORT:
+                    target.setCharacter(this.hero);
+                    target.setPosition(this.selectTargetPosition());
+                    break;
+                case BUFFING:
+                    target.setCharacter(this.hero);
+                    break;
+            }
+
+            try {
+                int spellDices = Dice.rollRedDice(1);
+                if (spellDices < this.hero.getMindPoints()) {
+                    caster.castSpell(target);
+                }
+            } catch (CannotWalkOverException
+                    | PositionDoesNotExistException
+                    | IsTrapException e) {
+                Display.printWarning(e.getMessage());
+            }
+        } catch (NoSpellLeftException e) {
+        	Display.printWarning(e.getMessage());
+        }
+    
+    }
+
+    private void usePotion() {
+
+        boolean stop = false;
+        do {
+            String answer = Keyboard.getInput("Do you want to use a potion? " +
+                    "[y/n] ");
+            if (answer.equalsIgnoreCase("y")) {
+                Display.print(this.hero.getItemsInBag());
+                int index = Integer.parseInt(
+                        Keyboard.getInput("Which armor would " +
+                        "you like to equip? [index from bag]"));
+                try {
+                    this.hero.usePotion(index);
+                } catch (InvalidItemException e) {
+                    Display.printWarning(e.getMessage());
+                }
+                stop = false;
+            } else if (answer.equalsIgnoreCase("n")) {
+                stop = true;
+            }
+        } while(!stop);
+    }
+
+    private int[] selectTargetPosition() {
+
+        int x, y;
+        boolean stop = false;
+        do {
+            Display.print("Select a visible position: ");
+            x = Keyboard.getIntInput("  Select x: ");
+            y = Keyboard.getIntInput("  Select y: ");
+
+            if (this.map.isVisible(x, y)) {
+                stop = true;
+            } else {
+                stop = false;
+            }
+
+
+        } while (!stop);
+
+        return new int[] {x, y};
+    }
 
     private void monsterAttack() throws HeroDiedException {
 
         ArrayList<Monster> monsters = this.map.getAttackersMonsters();
-        int counter = 0;
-        int[] monsterPosition;
-//        Display.print("------------------Monsters Attackers ----------------");
+
+        
         for (Monster m : monsters) {
-            monsterPosition = m.getPosition();
-//            System.out.printf("Monster (%d) Position: x:%d, y:%d\n", counter,
-//                    monsterPosition[0], monsterPosition[1]);
-            battle.physicalCombat(m, this.hero);
-//            Keyboard.getInput("Digite para continuar");
-            counter++;
+            try {
+            	SkeletonMage skm = (SkeletonMage) m;
+            	skm.hasSpells();
+            	Target target = new Target();
+            	target.setCharacter(this.hero);
+            	int spellDices = Dice.rollRedDice(1);
+            	if (spellDices < skm.getMindPoints()) {
+            		skm.castSpell(target);
+            	}
+            } catch (ClassCastException | NoSpellLeftException e) {
+                Display.printWarning(this.hero.getStatus(true));
+                this.physicalCombat(m, this.hero);
+            }
         }
         if (this.hero.getHealth() <= 0) {throw new HeroDiedException();}
 
     }
 
-    private int getHeroRangeToAttack() {
-        return hero.getEquippedWeaponRange();
-    }
 
-    private Monster selectTarget() throws
+    private ArrayList<Monster> selectTarget(int range, int maxTargets) throws
             NoAvailableMonstersToAttackException {
 
-        int range = getHeroRangeToAttack();
         ArrayList<Monster> monsters = this.map.getMonstersToAttack(range);
         if (monsters.size() == 0) {
             throw new NoAvailableMonstersToAttackException("No monsters in " +
                     "range to attack");
         }
-        StringBuilder s = new StringBuilder();
-        for (int i = 0; i < monsters.size(); i++) {
-            if (i != monsters.size() - 1) {
-                s.append(String.format("[%d] %s ", i,
-                        monsters.get(i).getStatus()));
-            } else {
-                s.append(String.format("[%d] %s, ", i,
-                        monsters.get(i).getStatus()));
+
+        ArrayList<Monster> targets = new ArrayList<>();
+        for (int j = 0; j < maxTargets; j++) {
+            StringBuilder s = new StringBuilder();
+            for (int i = 0; i < monsters.size(); i++) {
+                if (i != monsters.size() - 1) {
+                    s.append(String.format("[%d] %s ", i,
+                            monsters.get(i).getStatus()));
+                } else {
+                    s.append(String.format("[%d] %s, ", i,
+                            monsters.get(i).getStatus()));
+                }
             }
+
+            Display.print(s.toString());
+            boolean validSelection = false;
+            int index = -1;
+            do {
+                try {
+                    index = Keyboard.getIntInput("Select monster to attack " +
+                            "via list index: ");
+                    if (index >= 0) {
+                        validSelection = true;
+                    }
+                } catch (Exception e) {
+                    Display.printWarning("Not a valid list index, " +
+                            "please input a positive integer");
+                }
+            } while (!validSelection);
+            targets.add(monsters.remove(index));
         }
 
-        Display.print(s.toString());
-        boolean validSelection = false;
-        int index = -1;
-        do {
-            try {
-                index = Keyboard.getIntInput("Select monster to attack " +
-                        "via list index: ");
-                if (index >= 0) {
-                    validSelection = true;
-                }
-            } catch (Exception e) {
-                Display.printWarning("Not a valid list index, " +
-                        "please input a positive integer");
-            }
-        } while (!validSelection);
-
-        return monsters.get(index);
+        return targets;
     }
 
     private void monsterMovement() {
