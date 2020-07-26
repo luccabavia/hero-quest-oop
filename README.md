@@ -9,9 +9,9 @@ Only the default Java packages are needed. Just clone this repository and import
 ## Usage
 
 Run the _Runner.java_ and interactively play the game.
-Below you can see the start screen of the game.
+Below you can see the start screen of the game with the fog removed!
 
-
+<img src="game_screen.png" width="800" >
 
 ### Game rules
 
