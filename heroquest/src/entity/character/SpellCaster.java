@@ -1,5 +1,10 @@
 package entity.character;
 
+import exceptions.*;
+import item.equipment.spell.Spell;
+import item.equipment.spell.SpellEffectType;
+import target.Target;
+
 public interface SpellCaster {
 
     /**
@@ -11,8 +16,18 @@ public interface SpellCaster {
     /**
      * Execute currently equipped spell casting routine
      */
-    void castSpell();
+    void castSpell(Target target) throws CannotWalkOverException,
+            PositionDoesNotExistException, IsTrapException;
 
-    //void setSpellCastParameters();
+    SpellEffectType getEquippedSpellType();
 
+    void setEquippedSpell(int spellIndexInBag) throws
+            InvalidItemException;
+
+    void setSpell(Spell spell);
+
+    void hasSpells() throws NoSpellLeftException;
+    
+
+    int getEquippedSpellMaxTargets();
 }
