@@ -91,4 +91,14 @@ public class MonsterGenerator {
         } while(remainingEntities > 0);
     }
 
+    public void generateRandomEntityAtPosition(int[] position)
+            throws InvalidGeneratorSeedException {
+        MonsterType type =
+                MonsterType.values()[
+                        randGenerator.nextInt(
+                                MonsterType.values().length)
+                        ];
+        this.generateEntity(type, position);
+    }
+
 }
