@@ -1,8 +1,8 @@
 package item.equipment.weapon;
 
-import item.Item;
+import item.Collectible;
 
-public abstract class Weapon implements Item {
+public abstract class Weapon implements Collectible {
 
     private String name;
     private int hands;
@@ -24,10 +24,6 @@ public abstract class Weapon implements Item {
         this.description = description;
     }
 
-    @Override
-    public Item collect() {
-        return this;
-    }
 
     @Override
     public String getCharacteristics() {
@@ -49,13 +45,14 @@ public abstract class Weapon implements Item {
     }
 
     public int getAttack() {
+        this.durability--;
         return this.attack;
     }
 
-    public int performAttack() {
-        this.durability--;
-        return this.getAttack();
+    public int getDurability() {
+        return this.durability;
     }
+
 
     public int getRange() { return this.range; }
 }
