@@ -3,6 +3,9 @@ package entity.character.hero;
 import map.Map;
 import item.equipment.weapon.*;
 
+/**
+ * Define Barbarian hero type
+ */
 public class Barbarian extends Hero {
 
     public Barbarian(Map map, int x, int y, String name) {

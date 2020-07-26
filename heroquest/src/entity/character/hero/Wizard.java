@@ -8,6 +8,9 @@ import item.equipment.weapon.*;
 import item.equipment.spell.*;
 import target.Target;
 
+/**
+ * Define Wizard hero type
+ */
 public class Wizard extends Hero implements SpellCaster {
 
     private Spell equippedSpell;
