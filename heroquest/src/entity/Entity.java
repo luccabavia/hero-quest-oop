@@ -13,6 +13,16 @@ public abstract class Entity {
     protected int x;
     protected int y;
     protected boolean hidden;
+    protected boolean seeThrough;
+
+    protected Entity(int x, int y, String sprite, boolean hidden,
+                     boolean seeThrough) {
+        this.x = x;
+        this.y = y;
+        this.sprite = sprite;
+        this.hidden = hidden;
+        this.seeThrough = seeThrough;
+    }
 
     /**
      * Get the representation of entity.
@@ -27,4 +37,7 @@ public abstract class Entity {
 
     public boolean isHidden() { return this.hidden; }
 
+    public boolean isSeeThrough() {
+        return this.seeThrough;
+    }
 }
