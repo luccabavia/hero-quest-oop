@@ -36,33 +36,33 @@ public class MonsterGenerator {
      * @throws InvalidGeneratorSeedException
      */
     private void generateEntity(MonsterType monsterType, int[] position)
-            throws InvalidGeneratorSeedException {
+    		throws InvalidGeneratorSeedException {
 
-        try {
-            if (this.map.isAvailable(position[0], position[1])) {
-                switch (monsterType) {
-                    case SKELETON:
-                        this.map.setEntity(new Skeleton(map, position[0],
-                                position[1]));
-                        break;
-                    case SKELETON_MAGE:
-                        this.map.setEntity(new SkeletonMage(map, position[0]
-                                , position[1]));
-                        break;
-                    case GOBLIN:
-                        this.map.setEntity(new Goblin(map, position[0],
-                                position[1]));
-                        break;
-                }
-            }
-        } catch (PositionDoesNotExistException
-                | IsTrapException
-                | CannotWalkOverException e) {
-            throw new InvalidGeneratorSeedException(
-                    String.format("Cannot place entity at " + 
-                    "position: %d %d", position[0], position[1])
-            );
-        }
+    	try {
+    		this.map.isAvailable(position[0], position[1]);
+    		switch (monsterType) {
+    		case SKELETON:
+    			this.map.setEntity(new Skeleton(map, position[0],
+    					position[1]));
+    			break;
+    		case SKELETON_MAGE:
+    			this.map.setEntity(new SkeletonMage(map, position[0]
+    					, position[1]));
+    			break;
+    		case GOBLIN:
+    			this.map.setEntity(new Goblin(map, position[0],
+    					position[1]));
+    			break;
+
+    		}
+    	} catch (PositionDoesNotExistException
+    			| IsTrapException
+    			| CannotWalkOverException e) {
+    		throw new InvalidGeneratorSeedException(
+    				String.format("Cannot place entity at " + 
+    						"position: %d %d", position[0], position[1])
+    				);
+    	}
     }
 
     /**

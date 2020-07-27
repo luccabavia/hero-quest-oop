@@ -29,8 +29,8 @@ public class Teleport extends Spell {
         int[] position = target.getPosition();
 
         try {
-            if (this.map.isVisible(position[0], position[1])
-                    && this.map.isAvailable(position[0], position[1])) {
+        	this.map.isAvailable(position[0], position[1]);
+            if (this.map.isVisible(position[0], position[1])){
                 int[] oldPosition = character.getPosition();
                 character.setPosition(position[0], position[1]);
                 this.map.updateMap(oldPosition[0], oldPosition[1]);

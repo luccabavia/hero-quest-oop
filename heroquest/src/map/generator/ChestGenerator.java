@@ -58,29 +58,28 @@ public class ChestGenerator {
      * @throws InvalidGeneratorSeedException
      */
     private void generateEntity(boolean isTrap, int[] position,
-                                boolean hasSpellCaster)
-            throws InvalidGeneratorSeedException {
+    		boolean hasSpellCaster)
+    				throws InvalidGeneratorSeedException {
 
-        try {
-            if (this.map.isAvailable(position[0], position[1])) {
-                if (isTrap) {
-                    this.map.setEntity(new TrapChest(position[0],
-                            position[1]));
-                } else {
-                    NormalChest chest = new NormalChest(position[0],
-                            position[1]);
-                    this.createContents(chest, hasSpellCaster);
-                    this.map.setEntity(chest);
-                }
-            }
-        } catch (PositionDoesNotExistException
-                | IsTrapException
-                | CannotWalkOverException e) {
-        	throw new InvalidGeneratorSeedException(
-                    String.format("Cannot place entity at " + 
-                    "position: %d %d", position[0], position[1], e.getMessage())
-            );
-        }
+    	try {
+    		this.map.isAvailable(position[0], position[1]);
+    		if (isTrap) {
+    			this.map.setEntity(new TrapChest(position[0],
+    					position[1]));
+    		} else {
+    			NormalChest chest = new NormalChest(position[0],
+    					position[1]);
+    			this.createContents(chest, hasSpellCaster);
+    			this.map.setEntity(chest);
+    		}
+    	} catch (PositionDoesNotExistException
+    			| IsTrapException
+    			| CannotWalkOverException e) {
+    		throw new InvalidGeneratorSeedException(
+    				String.format("Cannot place entity at " + 
+    						"position: %d %d", position[0], position[1], e.getMessage())
+    				);
+    	}
     }
 
     /**
