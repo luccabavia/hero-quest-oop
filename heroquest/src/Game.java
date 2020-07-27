@@ -39,7 +39,12 @@ public class Game {
      */
     public void startGameLoop() {
         exit = false;
-        System.out.println("Game started!");
+        Display.printWarning("Game started!");
+        Display.printWarning("Explore, collect items, fight monsters! " +
+                "If you" +
+                " kill all the monsters or they kill you the game ends! " +
+                "During the game phase you can exit the game pressing 'q'.");
+
         StringBuilder finalMessage = new StringBuilder("Final message: ");
 
         while (!exit) {
@@ -59,8 +64,8 @@ public class Game {
             }
         }
         drawBoard();
-        Display.print(finalMessage.toString());
-        Display.print("Game terminated. Bye!");
+        Display.printWarning(finalMessage.toString());
+        Display.printWarning("Game terminated. Bye!");
     }
 
     /**
