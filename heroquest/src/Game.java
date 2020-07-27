@@ -15,6 +15,9 @@ import target.Target;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 
+/**
+ * Define game class to manage all interactions
+ */
 public class Game {
 
     private boolean exit;
@@ -31,6 +34,9 @@ public class Game {
 
     }
 
+    /**
+     * Start execution loop
+     */
     public void startGameLoop() {
         exit = false;
         Display.printWarning("Game started!");
@@ -60,6 +66,12 @@ public class Game {
         Display.printWarning("Game terminated. Bye!");
     }
 
+    /**
+     * Execute hero functions
+     * @throws HeroDiedException thrown when hero dies
+     * @throws MonstersDiedException thrown when all monsters are killed
+     * @throws FinishGameException thrown when user chooses to leave the game
+     */
     private void heroRound() throws HeroDiedException, MonstersDiedException,
             FinishGameException {
     	if(this.hero.hasPotionInBag())
@@ -71,6 +83,11 @@ public class Game {
 
     }
 
+    /**
+     * Execute monsters functions
+     * @throws MonstersDiedException thrown when all monsters are killed
+     * @throws HeroDiedException thrown when hero is killed
+     */
     private void monsterRound() throws MonstersDiedException,
             HeroDiedException {
 
@@ -84,10 +101,15 @@ public class Game {
     }
 
     /**
-     * Sets whether the map is standard or random
-     * @throws CannotWalkOverException
-     * @throws PositionDoesNotExistException
-     * @throws IsTrapException
+     * Sets whether the map is standard or random. Configures hero starting
+     * position.
+     * @throws CannotWalkOverException thrown when selected hero
+     * starting position is
+     * occupied by scenery object that cannot be traversed
+     * @throws PositionDoesNotExistException thrown when selected hero
+     * starting position does not exist
+     * @throws IsTrapException thrown when selected hero starting position
+     * is already occupied by a trap
      */
     private void configure() throws
             CannotWalkOverException, PositionDoesNotExistException,
@@ -108,6 +130,10 @@ public class Game {
         this.map.updateVisibility();
     }
 
+    /**
+     * Lets the user select the map mode (default or random)
+     * @return map mode type
+     */
     private MapMode selectMapMode() {
 
         try {
@@ -130,6 +156,11 @@ public class Game {
         }
     }
 
+    /**
+     * Lets the user select the hero type
+     * @param startPosition column and row where hero is placed at the start
+     * @return hero reference
+     */
     private Hero selectHero(int[] startPosition) {
 
         String heroName = Keyboard.getInput("Choose your hero name: ");
@@ -165,6 +196,9 @@ public class Game {
         return hero;
     }
 
+    /**
+     * Draws game map on screen
+     */
     private void drawBoard(){
     	this.map.updateVisibility();
     	StringBuilder s = new StringBuilder();
@@ -184,6 +218,11 @@ public class Game {
 
     }
 
+    /**
+     * Executes hero movement phase
+     * @throws HeroDiedException thrown when hero is killed
+     * @throws FinishGameException thrown when user chooses to end the game
+     */
     private void heroMovement() throws HeroDiedException, FinishGameException {
         String command;
         int steps = 0;
@@ -250,6 +289,9 @@ public class Game {
         }
     }
 
+    /**
+     * Hero's item collection phase
+     */
     private void collectItem() {
 
         Chest chest = this.hero.searchForItems();
@@ -291,6 +333,9 @@ public class Game {
         }
     }
 
+    /**
+     * Hero's equipment change phase
+     */
     private void changeHeroEquipment() {
         Display.print("Your current status is: ");
         Display.print(this.hero.getStatus());
@@ -354,6 +399,9 @@ public class Game {
         }
     }
 
+    /**
+     * Phase for changing hero's equipped armor
+     */
     private void changeHeroArmor() {
         int index = Integer.parseInt(Keyboard.getInput("Which armor would " +
                 "you like to equip? [index from bag]"));
@@ -366,6 +414,9 @@ public class Game {
         }
     }
 
+    /**
+     * Phase for changing hero's equipped weapon
+     */
     private void changeHeroWeapon() {
         int index = Integer.parseInt(Keyboard.getInput("Which weapon would " +
                 "you like to equip? [index from bag]"));
@@ -404,6 +455,9 @@ public class Game {
         }
     }
 
+    /**
+     * Phase for changing hero's equipped spell
+     */
     private void changeHeroSpell() {
         int index = Keyboard.getIntInput("Which spell would " +
                 "you like to equip? [index from bag]");
@@ -418,6 +472,11 @@ public class Game {
         }
     }
 
+    /**
+     * Hero's action phase, where the user chooses to attack, cast a spell
+     * or collect an item
+     * @throws MonstersDiedException thrown when all monsters are killed
+     */
     private void heroAction() throws MonstersDiedException {
 
         String messageBoth = "Select action type: " +
@@ -469,6 +528,10 @@ public class Game {
 
     }
 
+    /**
+     * Hero's attack routine: select a target and execute the equipped
+     * weapon's attack
+     */
     private void heroAttack() {
         try {
             Monster monster =
@@ -480,7 +543,13 @@ public class Game {
         }
 
     }
-    
+
+    /**
+     * Execute combat between two characters
+     * @param attacker character that will roll attack dices and deal damage
+     * @param defender character that will roll defense dices and
+     *                 possibly receive damage
+     */
     private void physicalCombat(Character attacker, Character defender) {
 
         int atk = Dice.rollCombatDice(
@@ -496,6 +565,11 @@ public class Game {
         defender.sufferEffect(Math.min(0, -(atk - def)));
     }
 
+    /**
+     * Display report after combat
+     * @param attacker character that dealt damage
+     * @param defender character that received damage
+     */
     private void afterActionReport(Character attacker, Character defender) {
         String report = String.format(
                 "\nAttacker: {%s}\n" +
@@ -506,6 +580,13 @@ public class Game {
         Display.print(report);
     }
 
+    /**
+     * Hero's spell casting routine
+     * @throws NoSpellLeftException thrown when hero has no more spells to
+     * cast, either in hand or in bag
+     * @throws NullPointerException thrown when hero has not equipped any
+     * spells and tries to cast one
+     */
     private void heroSpell() throws NoSpellLeftException,
             NullPointerException {
 
@@ -576,6 +657,9 @@ public class Game {
     
     }
 
+    /**
+     * Hero's potion usage routine
+     */
     private void usePotion() {
 
         boolean stop = false;
@@ -599,6 +683,10 @@ public class Game {
         } while(!stop);
     }
 
+    /**
+     * Set target position for spell usage that requires a (x, y) destination
+     * @return column and row value inputted by user
+     */
     private int[] selectTargetPosition() {
 
         int x, y;
@@ -620,6 +708,10 @@ public class Game {
         return new int[] {x, y};
     }
 
+    /**
+     * Monters' attack routine
+     * @throws HeroDiedException thrown when the hero is killed
+     */
     private void monsterAttack() throws HeroDiedException {
 
         ArrayList<Monster> monsters = this.map.getAttackersMonsters();
@@ -651,7 +743,15 @@ public class Game {
 
     }
 
-
+    /**
+     * Target character selection for spell usage that requires a character
+     * or more as targets
+     * @param range current attack range, given by spell equipped
+     * @param maxTargets number of targets selected
+     * @return array of monster targets selected
+     * @throws NoAvailableMonstersToAttackException thrown when there are no
+     * monster available to attack
+     */
     private ArrayList<Monster> selectTarget(int range, int maxTargets) throws
             NoAvailableMonstersToAttackException {
 
@@ -695,6 +795,9 @@ public class Game {
         return targets;
     }
 
+    /**
+     * Monster's movement routine
+     */
     private void monsterMovement() {
 
         ArrayList<Monster> monsters = this.map.getMonster();
