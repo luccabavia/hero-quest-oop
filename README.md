@@ -1,6 +1,7 @@
 # Hero Quest OOP
 
-Hero quest game, implementation with Java and OOP
+Hero quest game, implementation with Java and OOP.
+See the documentation [here]!
 
 ## Instalation
 
@@ -25,3 +26,5 @@ Below you can see the start screen of the game with the fog removed!
     * In the movement phase, each monster executes their specific movement routine.
     * In the action phase each monster checks the distance to the hero and tries to attack.
   * During attacks, the characters can only interact with other characters that are in the same column or row. Two characters that have a wall, door, chest or other character between them cannot interact.
+
+[here]: https://luccabavia.github.io/hero-quest-oop/
