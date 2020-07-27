@@ -277,9 +277,9 @@ public class Map {
      */
     private void positionExists(int x, int y) throws
             PositionDoesNotExistException {
-        if (x < 0 && y < 0 && x > this.map.length && y > this.map[0].length) {
+        if (x < 0 || y < 0 || x >= this.map.length || y >= this.map[0].length) {
             throw new PositionDoesNotExistException(
-                    String.format("Position is out of bounds"));
+                    "Position is out of bounds");
         }
 
     }
@@ -645,7 +645,7 @@ public class Map {
         }
 
         stop = true;
-        for (int i = heroPos[1] - 1; i > 0 && stop; i--) {
+        for (int i = heroPos[1] - 1; i >= 0 && stop; i--) {
             try{
             	positionIsEmpty(heroPos[0], i);
                 if(!this.map[heroPos[0]][i][0].isSeeThrough())
@@ -673,7 +673,7 @@ public class Map {
         }
 
         stop = true;
-        for (int i = heroPos[0] - 1; i > 0 && stop; i--) {
+        for (int i = heroPos[0] - 1; i >= 0 && stop; i--) {
             try{
             	positionIsEmpty(i, heroPos[1]);
                 if(!this.map[i][heroPos[1]][0].isSeeThrough())
