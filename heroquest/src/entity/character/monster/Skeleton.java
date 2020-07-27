@@ -3,6 +3,10 @@ package entity.character.monster;
 import item.equipment.weapon.*;
 import map.Map;
 
+/**
+ * Define an Skeleton can be set on Map
+ *
+ */
 public class Skeleton extends Monster {
 
     public Skeleton(Map map, int x, int y) {

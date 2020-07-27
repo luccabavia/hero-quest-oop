@@ -11,6 +11,10 @@ import target.Target;
 
 import java.util.ArrayList;
 
+/**
+ * Define an Skeleton Mage can be set on Map
+ *
+ */
 public class SkeletonMage extends Monster implements SpellCaster {
 
     private ArrayList<Spell> spells = new ArrayList<>();

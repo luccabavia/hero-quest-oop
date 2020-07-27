@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
+/**
+ * Class used to generate all Monster which will set on Map
+ */
 public class MonsterGenerator {
 
     private Map map;
@@ -26,6 +29,12 @@ public class MonsterGenerator {
         this.map = map;
     }
 
+    /**
+     * Method use to generate a Monster
+     * @param monsterType
+     * @param position
+     * @throws InvalidGeneratorSeedException
+     */
     private void generateEntity(MonsterType monsterType, int[] position)
             throws InvalidGeneratorSeedException {
 
@@ -56,6 +65,10 @@ public class MonsterGenerator {
         }
     }
 
+    /**
+     * Method use to set multiples Monsters can be set on map
+     * @param hashMap
+     */
     public void generateMultipleEntities(
             HashMap<MonsterType, int[][]> hashMap) {
 
@@ -74,7 +87,10 @@ public class MonsterGenerator {
             }
         }
     }
-
+    /**
+     * Method use to set random positions and damage Traps can be set on map
+     * @param maxEntitiesNumber
+     */
     public void generateMultipleRandomEntities(
             int maxEntitiesNumber) {
         int remainingEntities= maxEntitiesNumber;

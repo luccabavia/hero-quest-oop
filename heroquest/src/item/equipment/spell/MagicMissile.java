@@ -11,6 +11,10 @@ public class MagicMissile extends AttackSpell {
                 3, SpellEffectType.MULTI_ATTACK, 3);
     }
 
+    /**
+     * Method to cast Magic Missile spell which is featured by can made an attack 
+     * at most three targets which number is selected from attacker
+     */
     @Override
     public void castSpell(Target target) {
         int numberOfTargets = target.getSize();

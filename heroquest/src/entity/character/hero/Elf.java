@@ -7,9 +7,6 @@ import map.Map;
 import item.equipment.weapon.*;
 import target.Target;
 
-/**
- * Define Elf hero type
- */
 public class Elf extends Hero implements SpellCaster {
 
     private Spell equippedSpell;

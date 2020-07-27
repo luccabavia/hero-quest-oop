@@ -6,6 +6,9 @@ import item.equipment.potion.*;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Class used to generate all Potion which will set inside chest
+ */
 public class PotionGenerator {
 
     private static PotionGenerator instance;
@@ -18,6 +21,11 @@ public class PotionGenerator {
         return instance;
     }
 
+    /**
+     * Method use to generate a Potion
+     * @param itemType
+     * @return
+     */
     public Collectible generateItem(PotionType potionTypes) {
 
         switch (potionTypes) {
@@ -29,6 +37,11 @@ public class PotionGenerator {
         return null;
     }
 
+    /**
+     * Method use to set a maxNumber of random Potion types to set inside a Chest
+     * @param maxNumber
+     * @return
+     */
     public ArrayList<Collectible> generateMultipleRandomEntities(
             int maxNumber) {
 

@@ -43,6 +43,12 @@ public abstract class Character extends Entity implements WeaponUser {
 
     protected abstract void setStartingEquipment();
 
+    /**
+     * Method to move the Character to a North location at Map
+     * @throws PositionDoesNotExistException
+     * @throws CannotWalkOverException
+     * @throws IsTrapException
+     */
     public void moveNorth() throws
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
@@ -57,6 +63,12 @@ public abstract class Character extends Entity implements WeaponUser {
     	}
     }
 
+    /**
+     * Method to move the Character to a South location at Map
+     * @throws PositionDoesNotExistException
+     * @throws CannotWalkOverException
+     * @throws IsTrapException
+     */
     public void moveSouth() throws
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
@@ -71,6 +83,12 @@ public abstract class Character extends Entity implements WeaponUser {
         }
     }
 
+    /**
+     * Method to move the Character to a East location at Map
+     * @throws PositionDoesNotExistException
+     * @throws CannotWalkOverException
+     * @throws IsTrapException
+     */
     public void moveEast() throws
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
@@ -86,6 +104,12 @@ public abstract class Character extends Entity implements WeaponUser {
 
     }
 
+    /**
+     * Method to move the Character to a West location at Map
+     * @throws PositionDoesNotExistException
+     * @throws CannotWalkOverException
+     * @throws IsTrapException
+     */
     public void moveWest() throws
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
@@ -100,10 +124,18 @@ public abstract class Character extends Entity implements WeaponUser {
         }
     }
 
+    /**
+     * Method to get attack value from each kind of Character
+     * @return
+     */
     public abstract int getAttack();
 
     public abstract int getDefense();
 
+    /**
+     * Method to return type of Combat dice from each Character
+     * @return
+     */
     public CombatDiceType getDefenseType() {
         return this.defenseType;
     }
@@ -128,6 +160,10 @@ public abstract class Character extends Entity implements WeaponUser {
         return this.bodyPoints;
     }
 
+    /**
+     * Get amount of mind points the character currently has
+     * @return int character's mind points
+     */
     public int getMindPoints() {
         return this.mindPoints;
     }
@@ -147,6 +183,11 @@ public abstract class Character extends Entity implements WeaponUser {
         return s;
     }
 
+    /**
+     * Method to return actual status of a Character
+     * @param summarized
+     * @return
+     */
     public String getStatus(boolean summarized) {
         if (summarized) {
             String s = String.format(

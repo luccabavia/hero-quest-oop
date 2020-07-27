@@ -18,6 +18,10 @@ public class Fireball extends AttackSpell {
         this.map = map;
     }
 
+    /**
+     * Method to cast Fireball spell which is featured by a an attack to
+     * one target and all character around the target with an reduced damage
+     */
     @Override
     public void castSpell(Target target) {
         Character targetChar = target.getCharacter();
@@ -29,6 +33,7 @@ public class Fireball extends AttackSpell {
         this.casts--;
     }
 
+    
     private void aoeDamage(int x, int y) {
         ArrayList<Monster> monster =
                 this.map.getCharactersAround(x, y);

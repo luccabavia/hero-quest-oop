@@ -2,6 +2,9 @@ package entity.trap;
 
 import entity.Entity;
 
+/**
+ * Define trap than can be created in the game.
+ */
 public class Trap extends Entity{
 
     private int damage;

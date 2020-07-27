@@ -7,6 +7,10 @@ import map.Map;
 import entity.character.Character;
 import java.util.Random;
 
+/**
+ * Define an Monster can be set on Map
+ *
+ */
 public abstract class Monster extends Character {
 
     protected int maxSteps;
@@ -34,6 +38,10 @@ public abstract class Monster extends Character {
         return this.weapon.getRange();
     }
 
+    /**
+     * Method to do primary movements of all Monsters
+     * Which is featured by try to go random amount of steps, from 0 to maxSteps, and random directions
+     */
     public void move() {
         Random random = new Random();
         int steps = random.nextInt(this.maxSteps) + 1;

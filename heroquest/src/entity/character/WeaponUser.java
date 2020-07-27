@@ -1,5 +1,9 @@
 package entity.character;
 
+/**
+ * Interface of an Weapon user
+ *
+ */
 public interface WeaponUser {
 
     /**
