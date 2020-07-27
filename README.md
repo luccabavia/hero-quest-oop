@@ -1,7 +1,7 @@
 # Hero Quest OOP
 
 Hero quest game, implementation with Java and OOP.
-See the documentation [here](https://luccabavia.github.io/hero-quest-oop/docs)!
+See the documentation [here](https://luccabavia.github.io/hero-quest-oop/)!
 
 ## Instalation
 
