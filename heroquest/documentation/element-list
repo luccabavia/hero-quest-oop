@@ -1,0 +1,21 @@
+unnamed package
+bag
+dice
+entity
+entity.character
+entity.character.hero
+entity.character.monster
+entity.chest
+entity.scenery
+entity.trap
+exceptions
+io
+item
+item.equipment.armor
+item.equipment.potion
+item.equipment.spell
+item.equipment.weapon
+item.treasure
+map
+map.generator
+target
