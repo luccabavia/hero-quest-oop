@@ -39,9 +39,8 @@ public class TrapGenerator {
             throws InvalidGeneratorSeedException {
 
         try {
-            if (this.map.isAvailable(position[0], position[1])) {
-               this.map.setEntity(new Trap(position[0], position[1], damage));
-            }
+            this.map.isAvailable(position[0], position[1]);
+            this.map.setEntity(new Trap(position[0], position[1], damage));
         } catch (PositionDoesNotExistException
                 | IsTrapException
                 | CannotWalkOverException e) {

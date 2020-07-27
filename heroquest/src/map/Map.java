@@ -13,7 +13,10 @@ import io.ImportFromFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
+/**
+ * Define Map Class where Game takes place
+ *
+ */
 public class Map {
 
     private static Map instance;
@@ -25,6 +28,9 @@ public class Map {
     private final ChestGenerator CHEST_GENERATOR;
     private final TrapGenerator TRAP_GENERATOR;
 
+    /**
+     *  Constructor method to instance all kinds of interactive objects generators can be set inside a map
+     */
     private Map() {
         this.importMap();
 
@@ -45,6 +51,9 @@ public class Map {
         return instance;
     }
 
+    /**
+     * Method to import root map from a TXT file
+     */
     private void importMap() {
 
         String currentDir = System.getProperty("user.dir");
@@ -64,6 +73,14 @@ public class Map {
         };
     }
 
+    /**
+     * Method to set kind of game mode an user wants
+     * @param mapMode
+     * @param hero
+     * @throws CannotWalkOverException
+     * @throws PositionDoesNotExistException
+     * @throws IsTrapException
+     */
     public void setGameMode(MapMode mapMode, Hero hero) throws
             CannotWalkOverException, PositionDoesNotExistException,
             IsTrapException {
@@ -87,6 +104,9 @@ public class Map {
 
     }
 
+    /**
+     * Method to generate all kinds of interactive objects at fixed positions can be set inside a map
+     */
     private void createStandardMap() {
 
         HashMap<Boolean, int[][]> chestHashMap = new HashMap<>();
@@ -187,6 +207,10 @@ public class Map {
 
     }
 
+    /**
+     * Method to generate randomly all kinds of interactive objects at randomly positions can be set inside a map
+     * at a maximum value chosen by developer
+     */
     private void createRandomMap() {
 
         this.CHEST_GENERATOR.generateMultipleRandomEntities(15,
@@ -198,19 +222,27 @@ public class Map {
 
     }
 
+    /**
+     * Method to check if have any chest at specific position
+     * @param x
+     * @param y
+     * @return
+     * @throws PositionDoesNotExistException
+     */
     public Chest hasChest(int x, int y) throws
-            PositionDoesNotExistException {
-
-            if (this.positionExists(x, y)) {
-                try {
-                    return (Chest) this.map[x][y][1];
-                } catch (ClassCastException e) {
-                    return null;
-                }
-            }
-            return null;
+    PositionDoesNotExistException {
+    	try {
+    		this.positionExists(x, y);
+    		return (Chest) this.map[x][y][1];
+    	} catch (ClassCastException e) {
+    		return null;
+    	}
     }
 
+    /**
+     * Method to return Map visualization 
+     * @return an Sprite string array
+     */
     public String[][] drawMap() {
     	int[] mapSize = this.getMapSize();
     	String[][] mapView = new String[mapSize[0]][mapSize[1]];
@@ -237,20 +269,29 @@ public class Map {
         return mapView;
     }
 
-    private boolean positionExists(int x, int y) throws
+    /**
+     * Method to check if an specific position exists
+     * @param x
+     * @param y
+     * @throws PositionDoesNotExistException when is out of map Bounds
+     */
+    private void positionExists(int x, int y) throws
             PositionDoesNotExistException {
-        if (x >= 0 && y >= 0 &&
-                x < this.map.length && y < this.map[0].length) {
-            return true;
-        } else {
+        if (x < 0 && y < 0 && x > this.map.length && y > this.map[0].length) {
             throw new PositionDoesNotExistException(
-                    String.format("Position is out of bounds")
-            );
+                    String.format("Position is out of bounds"));
         }
 
     }
 
-    private boolean positionIsEmpty(int x, int y) throws
+    /**
+     * Method to check if an specific position is empty
+     * @param x
+     * @param y
+     * @throws CannotWalkOverException when had already an object in position or is a Wall
+     * @throws IsTrapException when had an trap at position
+     */
+    private void positionIsEmpty(int x, int y) throws
             CannotWalkOverException, IsTrapException {
         try {
             if (!((Scenery) this.map[x][y][0]).canWalkOver()) {
@@ -276,7 +317,6 @@ public class Map {
                     );
                 }
             }
-            return true;
         } catch (ClassCastException e) {
             throw new CannotWalkOverException(
                     String.format("Cannot walk to position (%d, %d)", x, y)
@@ -285,24 +325,34 @@ public class Map {
 
     }
 
-    public boolean isAvailable(int x, int y) throws
+    /**
+     * Method to check if an specific position is empty and exist
+     * @param x
+     * @param y
+     * @throws PositionDoesNotExistException
+     * @throws CannotWalkOverException
+     * @throws IsTrapException
+     */
+    public void isAvailable(int x, int y) throws
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
-        boolean isEmpty = false;
-        boolean exists = false;
         try {
-            exists = this.positionExists(x, y);
-            isEmpty = this.positionIsEmpty(x, y);
+            this.positionExists(x, y);
+            this.positionIsEmpty(x, y);
         } catch (PositionDoesNotExistException e){
-            exists = false;
             throw e;
         } catch (CannotWalkOverException | IsTrapException e) {
-            isEmpty = false;
             throw e;
         }
-        return isEmpty && exists;
     }
 
+    /**
+     * Method to set hero in a specific position of Map
+     * @param hero
+     * @throws CannotWalkOverException
+     * @throws PositionDoesNotExistException
+     * @throws IsTrapException
+     */
     private void placeHero(Hero hero) throws
             CannotWalkOverException, PositionDoesNotExistException,
             IsTrapException {
@@ -310,10 +360,18 @@ public class Map {
         this.setEntity(hero);
     }
 
+    /**
+     * Method to get hero position
+     * @return
+     */
     public int[] getHeroPosition() {
         return this.hero.getPosition();
     }
 
+    /**
+     *  Method to get monster was set at Map
+     * @return
+     */
     public ArrayList<Monster> getMonster() {
 
         ArrayList<Monster> monsters = new ArrayList<>();
@@ -334,7 +392,11 @@ public class Map {
         return monsters;
     }
 
-  
+    /**
+     * Method to get a list of monster inside a Hero's range
+     * @param range
+     * @return
+     */
     public ArrayList<Monster> getMonstersToAttack(int range) {
     	ArrayList<Monster> monsters = new ArrayList<>();
     	
@@ -353,7 +415,13 @@ public class Map {
     	return monsters;
     }
     
-    
+    /**
+     * Method to get the first not see trough entity from each direction (NORTH, SOUTH, WEST, EAST)
+     * @param range
+     * @param x
+     * @param y
+     * @return
+     */
     private ArrayList<Entity> getEntityInRange(int range, int x, int y) {
 
     	ArrayList<Entity> entities = new ArrayList<>();
@@ -439,6 +507,12 @@ public class Map {
         return monsters;
     }
 
+    /**
+     * Method to take the list of characters around a specific position
+     * @param x
+     * @param y
+     * @return
+     */
     public ArrayList<Monster> getCharactersAround(int x, int y) {
         ArrayList<Monster> monsters = new ArrayList<>();
 
@@ -468,6 +542,13 @@ public class Map {
         return monsters;
     }
 
+    /**
+     * Method to set an entity in the Map
+     * @param ent
+     * @throws PositionDoesNotExistException
+     * @throws CannotWalkOverException
+     * @throws IsTrapException
+     */
     public void setEntity(Entity ent) throws
             PositionDoesNotExistException, CannotWalkOverException,
             IsTrapException {
@@ -480,16 +561,28 @@ public class Map {
         }
     }
 
+    /**
+     * Method to remove an entity in the Map
+     * @param entity
+     */
     public void removeEntity(Entity entity) {
         int[] pos = entity.getPosition();
         this.map[pos[0]][pos[1]][1] = null;
     }
 
+    /**
+     * Method to check if have any monster inside Map
+     * @return
+     */
     public boolean hasMonsters() {
         ArrayList<Monster> monsters = getMonster();
         return monsters.size() > 0;
     }
 
+    /**
+     * Method to disarm a Trap chest and generate a monster at same position
+     * @param position
+     */
     public void disarmTrapChest(int[] position) {
 
         this.removeEntity((Chest) this.map[position[0]][position[1]][1]);
@@ -499,6 +592,11 @@ public class Map {
         }
     }
 
+    /**
+     * Method removing the disarmed trap and putting Hero at same position 
+     * @param x
+     * @param y
+     */
     public void disarmTrap(int x, int y) {
 
         Trap trap = (Trap) this.map[x][y][1];
@@ -509,6 +607,11 @@ public class Map {
 
     }
 
+    /**
+     * Method to update Entity position inside the map
+     * @param oldX
+     * @param oldY
+     */
     public void updateMap(int oldX, int oldY) {
 
         Entity entity = this.map[oldX][oldY][1];
@@ -518,6 +621,10 @@ public class Map {
         this.map[oldX][oldY][1] = null;
     }
 
+    /**
+     * Method to update Hero's visibility of displayed map in each direction(NORTH, SOUTH, EAST, EAST)
+     * The method update visibilities in each direction until a not see trough entity
+     */
     public void updateVisibility() {
 
         int[] heroPos = this.getHeroPosition();
@@ -526,8 +633,8 @@ public class Map {
         boolean stop = true;
         for (int i = heroPos[1] + 1; i < this.map[0].length && stop; i++) {
             try{
-                if(!this.map[heroPos[0]][i][0].isSeeThrough()
-                        || !positionIsEmpty(heroPos[0], i))
+            	positionIsEmpty(heroPos[0], i);
+                if(!this.map[heroPos[0]][i][0].isSeeThrough())
                     stop = false;
             } catch (CannotWalkOverException e) {
                 stop = false;
@@ -540,8 +647,8 @@ public class Map {
         stop = true;
         for (int i = heroPos[1] - 1; i > 0 && stop; i--) {
             try{
-                if(!this.map[heroPos[0]][i][0].isSeeThrough()
-                        || !positionIsEmpty(heroPos[0], i))
+            	positionIsEmpty(heroPos[0], i);
+                if(!this.map[heroPos[0]][i][0].isSeeThrough())
                     stop = false;
             } catch (CannotWalkOverException e) {
                 stop = false;
@@ -554,8 +661,8 @@ public class Map {
         stop = true;
         for (int i = heroPos[0] + 1; i < this.map.length && stop; i++) {
             try{
-                if(!this.map[i][heroPos[1]][0].isSeeThrough()
-                        ||  !positionIsEmpty(i, heroPos[1]))
+            	positionIsEmpty(i, heroPos[1]);
+                if(!this.map[i][heroPos[1]][0].isSeeThrough())
                     stop = false;
             } catch (CannotWalkOverException e) {
                 stop = false;
@@ -568,8 +675,8 @@ public class Map {
         stop = true;
         for (int i = heroPos[0] - 1; i > 0 && stop; i--) {
             try{
-                if(!this.map[i][heroPos[1]][0].isSeeThrough()
-                        ||  !positionIsEmpty(i, heroPos[1]))
+            	positionIsEmpty(i, heroPos[1]);
+                if(!this.map[i][heroPos[1]][0].isSeeThrough())
                     stop = false;
             } catch (CannotWalkOverException e) {
                 stop = false;
@@ -580,6 +687,12 @@ public class Map {
         }
     }
 
+    /**
+     * Method to check visibility of a specific position
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean isVisible(int x, int y) {
         return this.visibility[x][y];
     }
